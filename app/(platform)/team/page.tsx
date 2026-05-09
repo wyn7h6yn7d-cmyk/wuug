@@ -1,13 +1,59 @@
-import { PageHeader } from "@/components/ui/page-header";
-import { SurfaceCard } from "@/components/ui/surface-card";
+import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
+import { AccessRestricted } from "@/components/access/access-restricted";
+import { TeamPageClient } from "@/components/team/team-page-client";
+import type { AppRole } from "@/lib/permissions";
 
 export default function TeamPage() {
+  return <TeamPageServer />;
+}
+
+async function TeamPageServer() {
+  const supabase = createClient(await cookies());
+  const { data: userData } = await supabase.auth.getUser();
+  const user = userData.user;
+  if (!user) return <AccessRestricted backHref="/login" />;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id, organization_id, role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const role = ((profile?.role as AppRole | undefined) ?? "member") as AppRole;
+  const organizationId = profile?.organization_id ?? null;
+  const profileId = profile?.id ?? user.id;
+
+  if (role === "member" || !organizationId) {
+    return <AccessRestricted backHref="/my-day" />;
+  }
+
+  const { data: members } = await supabase
+    .from("profiles")
+    .select("id, full_name, email, role, created_at")
+    .order("full_name", { ascending: true });
+
+  const { data: pendingInvites } = await supabase
+    .from("invitations")
+    .select("id,email,role,token,created_at,expires_at,accepted_at")
+    .is("accepted_at", null)
+    .order("created_at", { ascending: false });
+
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.NEXT_PUBLIC_VERCEL_URL ||
+    "http://localhost:3000";
+
+  const origin = baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`;
+
   return (
-    <div className="space-y-6">
-      <PageHeader title="Tiim" subtitle="Peagi. Siin tuleb töökoormuse ja rollide ülevaade." />
-      <SurfaceCard className="p-6 text-sm text-slate-600">
-        See vaade on ajutiselt lihtsustatud, et hoida build stabiilne.
-      </SurfaceCard>
-    </div>
+    <TeamPageClient
+      role={role}
+      organizationId={organizationId}
+      inviterProfileId={profileId}
+      members={(members ?? []) as any[]}
+      invitations={(pendingInvites ?? []) as any[]}
+      appOrigin={origin}
+    />
   );
 }

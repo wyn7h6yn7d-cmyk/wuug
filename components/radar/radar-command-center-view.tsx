@@ -9,7 +9,7 @@ import { BentoGrid, BentoItem } from "@/components/command-center/bento-grid";
 type RadarItem = {
   title: string;
   meta: string;
-  tag: "Seisab" | "Riskis" | "Aegub" | "Omanik puudub";
+  tag: "Stuck" | "At risk" | "Due soon" | "Missing owner";
   tone: "warn" | "risk" | "neutral";
   icon: React.ComponentType<{ className?: string }>;
 };
@@ -17,39 +17,39 @@ type RadarItem = {
 const items: RadarItem[] = [
   {
     title: "Nordic OÜ",
-    meta: "pole liikunud 6 päeva • järgmine samm: pakkumine",
-    tag: "Seisab",
+    meta: "no activity for 6 days • next step: proposal",
+    tag: "Stuck",
     tone: "warn",
     icon: PauseCircle,
   },
   {
-    title: "Projekt: Veebilehe arendus",
-    meta: "tähtaeg 11. juuni • ootab kinnitust",
-    tag: "Riskis",
+    title: "Project: Website build",
+    meta: "deadline Jun 11 • waiting for approval",
+    tag: "At risk",
     tone: "risk",
     icon: AlertTriangle,
   },
   {
-    title: "Lubadus: saata lepingu mustand",
-    meta: "aegub homme • klient: Scandium Kinnisvara",
-    tag: "Aegub",
+    title: "Promise: send contract draft",
+    meta: "due tomorrow • client: Scandium Real Estate",
+    tag: "Due soon",
     tone: "warn",
     icon: Timer,
   },
   {
-    title: "Uus päring: Wave OÜ",
-    meta: "omanik määramata • vajab vastutajat",
-    tag: "Omanik puudub",
+    title: "New lead: Wave OÜ",
+    meta: "no owner assigned • needs an assignee",
+    tag: "Missing owner",
     tone: "neutral",
     icon: UserRound,
   },
 ];
 
 const tagTone: Record<RadarItem["tag"], "calm" | "warn" | "risk" | "neutral"> = {
-  Seisab: "warn",
-  Riskis: "risk",
-  Aegub: "warn",
-  "Omanik puudub": "neutral",
+  Stuck: "warn",
+  "At risk": "risk",
+  "Due soon": "warn",
+  "Missing owner": "neutral",
 };
 
 export function RadarCommandCenterView() {
@@ -62,17 +62,17 @@ export function RadarCommandCenterView() {
             <PulseBadge label="Attention center" tone="warn" />
           </div>
           <p className="mt-2 text-sm text-slate-600">
-            Siin on asjad, mis vajavad tähelepanu enne kui need muutuvad probleemiks.
+            These are the items that need attention before they become problems.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <GradientButton variant="secondary">
             <Sparkles className="h-4 w-4" />
-            AI soovitused
+            AI suggestions
           </GradientButton>
-          <Link href="/" className="hidden md:block">
+          <Link href="/app" className="hidden md:block">
             <GradientButton>
-              Ava tänane pulss <ArrowRight className="h-4 w-4" />
+              Open today pulse <ArrowRight className="h-4 w-4" />
             </GradientButton>
           </Link>
         </div>
@@ -94,19 +94,19 @@ export function RadarCommandCenterView() {
               />
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <PulseBadge label="Seisab: 5" tone="warn" />
-                  <PulseBadge label="Riskis: 2" tone="risk" />
-                  <PulseBadge label="Aegub: 4" tone="warn" />
-                  <PulseBadge label="Omanik puudub: 3" tone="neutral" />
+                  <PulseBadge label="Stuck: 5" tone="warn" />
+                  <PulseBadge label="At risk: 2" tone="risk" />
+                  <PulseBadge label="Due soon: 4" tone="warn" />
+                  <PulseBadge label="Missing owner: 3" tone="neutral" />
                 </div>
                 <p className="text-sm text-slate-600">
-                  Eesmärk pole “rohkem tööd”, vaid <span className="font-semibold text-slate-900">vähem üllatusi</span>.
-                  Vali üks kaart ja tee üks otsus.
+                  The goal isn’t “more work” — it’s <span className="font-semibold text-slate-900">fewer surprises</span>.
+                  Pick one card and make one decision.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <GradientButton size="sm">Vaata kriitilisi</GradientButton>
+                  <GradientButton size="sm">View critical</GradientButton>
                   <GradientButton size="sm" variant="secondary">
-                    Vaata seisvaid
+                    View stuck
                   </GradientButton>
                 </div>
               </div>
@@ -118,10 +118,10 @@ export function RadarCommandCenterView() {
               <GlassCard className="p-6">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h2 className="text-xl font-semibold text-slate-900">Signaalid</h2>
-                    <p className="mt-1 text-sm text-slate-600">Kaardid, mitte tabelid. Selge, tegutsetav, rahulik.</p>
+                    <h2 className="text-xl font-semibold text-slate-900">Signals</h2>
+                    <p className="mt-1 text-sm text-slate-600">Cards, not tables. Clear, actionable, calm.</p>
                   </div>
-                  <PulseBadge label="Mock-andmed" tone="neutral" />
+                  <PulseBadge label="Mock data" tone="neutral" />
                 </div>
 
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -146,12 +146,14 @@ export function RadarCommandCenterView() {
                         </div>
 
                         <div className="mt-3 flex flex-wrap gap-2">
-                          <GradientButton size="sm">Ava</GradientButton>
+                          <Link href="/clients">
+                            <GradientButton size="sm">Open</GradientButton>
+                          </Link>
                           <GradientButton size="sm" variant="secondary">
-                            Tee järgmine samm
+                            Add next step
                           </GradientButton>
                           <GradientButton size="sm" variant="ghost">
-                            Lükka edasi
+                            Snooze
                           </GradientButton>
                         </div>
                       </article>
@@ -167,9 +169,9 @@ export function RadarCommandCenterView() {
           <GlassCard className="p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <div className="text-sm font-semibold text-slate-900">AI soovitab</div>
+                <div className="text-sm font-semibold text-slate-900">wuug suggests</div>
                 <p className="mt-1 text-sm text-slate-600">
-                  Kui valid ühe signaali, annan 2-3 mikro-sammu ja pakun valmis sõnumi kliendile.
+                  Pick one signal and I’ll propose 2–3 micro-steps and a ready-to-send message.
                 </p>
               </div>
               <PulseBadge label="wuug AI" tone="neutral" />
@@ -177,9 +179,9 @@ export function RadarCommandCenterView() {
 
             <div className="mt-4 space-y-2">
               {[
-                "Nordic OÜ: kirjuta 2-lõiguline “kas kinnitame täna?” e-kiri.",
-                "Projekt riskis: tee 3 valikuga otsus ja lukusta uus tähtaeg.",
-                "Omanik puudub: määra vastutaja ja lisa 1. samm 5 minutiga.",
+                "Nordic OÜ: draft a short “can we confirm today?” email.",
+                "At-risk project: propose 3 options and lock a new deadline.",
+                "Missing owner: assign responsibility and add the first step in 5 minutes.",
               ].map((rec) => (
                 <button
                   key={rec}
@@ -194,9 +196,9 @@ export function RadarCommandCenterView() {
             <div className="mt-4 grid gap-2">
               <GradientButton>
                 <Sparkles className="h-4 w-4" />
-                Tee plaan
+                Create plan
               </GradientButton>
-              <GradientButton variant="secondary">Loo sõnum</GradientButton>
+              <GradientButton variant="secondary">Draft message</GradientButton>
             </div>
           </GlassCard>
         </aside>

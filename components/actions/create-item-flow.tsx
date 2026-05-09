@@ -22,58 +22,58 @@ type FlowItem = {
 const flowItems: FlowItem[] = [
   {
     key: "client",
-    label: "Uus klient",
+    label: "New client",
     icon: UserPlus,
-    modalTitle: "Uus klient",
+    modalTitle: "New client",
     fields: [
-      { key: "companyName", label: "Ettevõtte nimi", placeholder: "Nt Nordic OÜ" },
-      { key: "contactName", label: "Kontaktisik", placeholder: "Nt Kontaktisik" },
-      { key: "email", label: "E-post", placeholder: "nimi@ettevõte.ee", type: "email" },
-      { key: "phone", label: "Telefon", placeholder: "+372 ...", type: "tel" },
-      { key: "note", label: "Märkus", placeholder: "Oluline taustainfo kliendi kohta" },
-      { key: "nextStep", label: "Järgmine samm", placeholder: "Nt Saada pakkumine" },
-      { key: "dueDate", label: "Tähtaeg", placeholder: "Vali kuupäev", type: "date" },
+      { key: "companyName", label: "Company name", placeholder: "e.g. Nordic OÜ" },
+      { key: "contactName", label: "Contact name", placeholder: "e.g. Main contact" },
+      { key: "email", label: "Email", placeholder: "name@company.com", type: "email" },
+      { key: "phone", label: "Phone", placeholder: "+372 …", type: "tel" },
+      { key: "note", label: "Note", placeholder: "Important context about this client" },
+      { key: "nextStep", label: "Next step", placeholder: "e.g. Send proposal" },
+      { key: "dueDate", label: "Due date", placeholder: "Pick a date", type: "date" },
     ],
   },
   {
     key: "project",
-    label: "Uus projekt",
+    label: "New project",
     icon: FolderPlus,
-    modalTitle: "Uus projekt",
+    modalTitle: "New project",
     fields: [
-      { key: "projectName", label: "Projekti nimi", placeholder: "Nt Veebilehe arendus" },
-      { key: "client", label: "Klient", placeholder: "Vali klient" },
-      { key: "owner", label: "Vastutaja", placeholder: "Nt Sina" },
-      { key: "dueDate", label: "Tähtaeg", placeholder: "Vali kuupäev", type: "date" },
-      { key: "status", label: "Staatus", placeholder: "Nt Töös" },
-      { key: "nextStep", label: "Järgmine samm", placeholder: "Nt Disain kinnitamisel" },
+      { key: "projectName", label: "Project name", placeholder: "e.g. Website build" },
+      { key: "client", label: "Client", placeholder: "Select client" },
+      { key: "owner", label: "Owner", placeholder: "e.g. You" },
+      { key: "dueDate", label: "Due date", placeholder: "Pick a date", type: "date" },
+      { key: "status", label: "Status", placeholder: "e.g. In progress" },
+      { key: "nextStep", label: "Next step", placeholder: "e.g. Awaiting design approval" },
     ],
   },
   {
     key: "task",
-    label: "Uus tegevus",
+    label: "New task",
     icon: ListTodo,
-    modalTitle: "Uus tegevus",
+    modalTitle: "New task",
     fields: [
-      { key: "taskName", label: "Tegevuse nimi", placeholder: "Nt Saada pakkumine" },
-      { key: "context", label: "Klient/projekt", placeholder: "Nt Nordic OÜ / Veebilehe arendus" },
-      { key: "owner", label: "Vastutaja", placeholder: "Nt Sina" },
-      { key: "dueDate", label: "Tähtaeg", placeholder: "Vali kuupäev", type: "date" },
-      { key: "priority", label: "Prioriteet", placeholder: "Nt Kõrge" },
-      { key: "status", label: "Staatus", placeholder: "Nt Planeeritud" },
+      { key: "taskName", label: "Task title", placeholder: "e.g. Send proposal" },
+      { key: "context", label: "Client / project", placeholder: "e.g. Nordic OÜ / Website build" },
+      { key: "owner", label: "Owner", placeholder: "e.g. You" },
+      { key: "dueDate", label: "Due date", placeholder: "Pick a date", type: "date" },
+      { key: "priority", label: "Priority", placeholder: "e.g. High" },
+      { key: "status", label: "Status", placeholder: "e.g. Planned" },
     ],
   },
   {
     key: "promise",
-    label: "Uus lubadus",
+    label: "New promise",
     icon: Handshake,
-    modalTitle: "Uus lubadus",
+    modalTitle: "New promise",
     fields: [
-      { key: "client", label: "Klient", placeholder: "Nt Nordic OÜ" },
-      { key: "promise", label: "Lubadus", placeholder: "Nt Saada pakkumine" },
-      { key: "owner", label: "Vastutaja", placeholder: "Nt Sina" },
-      { key: "dueDate", label: "Tähtaeg", placeholder: "Vali kuupäev", type: "date" },
-      { key: "note", label: "Märkus", placeholder: "Lisainfo lubaduse kohta" },
+      { key: "client", label: "Client", placeholder: "e.g. Nordic OÜ" },
+      { key: "promise", label: "Promise", placeholder: "e.g. Send proposal" },
+      { key: "owner", label: "Owner", placeholder: "e.g. You" },
+      { key: "dueDate", label: "Due date", placeholder: "Pick a date", type: "date" },
+      { key: "note", label: "Note", placeholder: "Extra context about this promise" },
     ],
   },
 ];
@@ -122,7 +122,7 @@ export function CreateItemFlow() {
           className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-500 via-violet-500 to-teal-400 px-4 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(97,107,255,0.28)] transition hover:opacity-95"
         >
           <Plus className="h-4 w-4" />
-          + Lisa uus
+          + Add new
         </button>
 
         <AnimatePresence>
@@ -130,7 +130,7 @@ export function CreateItemFlow() {
             <>
               <motion.button
                 type="button"
-                aria-label="Sulge uus kirje menüü"
+                aria-label="Close add new menu"
                 onClick={() => setMenuOpen(false)}
                 className="fixed inset-0 z-20 cursor-default bg-transparent"
                 initial={{ opacity: 0 }}
@@ -171,7 +171,7 @@ export function CreateItemFlow() {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="w-full max-w-xl rounded-[28px] border border-[#E5EAF3] bg-white p-6 shadow-[0_18px_44px_rgba(66,86,122,0.18)]"
+              className="w-full max-w-xl overflow-y-auto rounded-[28px] border border-[#E5EAF3] bg-white p-6 shadow-[0_18px_44px_rgba(66,86,122,0.18)] max-h-[85vh]"
               initial={{ opacity: 0, y: 10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 8, scale: 0.98 }}
@@ -181,7 +181,7 @@ export function CreateItemFlow() {
               <button
                 onClick={closeModal}
                 className="rounded-xl border border-slate-200 p-2 text-slate-500"
-                aria-label="Sulge aken"
+                aria-label="Close modal"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -209,13 +209,13 @@ export function CreateItemFlow() {
                   onClick={closeModal}
                   className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700"
                 >
-                  Tühista
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   className="rounded-xl bg-gradient-to-r from-blue-500 via-violet-500 to-teal-400 px-4 py-2 text-sm font-semibold text-white"
                 >
-                  Lisa
+                  Add
                 </button>
               </div>
             </form>
@@ -233,7 +233,7 @@ export function CreateItemFlow() {
             exit={{ opacity: 0, y: 10 }}
           >
             <Check className="h-4 w-4" />
-            Lisatud
+            Added
           </motion.div>
         ) : null}
       </AnimatePresence>

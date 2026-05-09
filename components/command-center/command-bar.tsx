@@ -17,7 +17,7 @@ type CommandBarProps = {
 };
 
 export function CommandBar({
-  placeholder = "Küsi wuugilt või otsi…",
+  placeholder = "Ask wuug or search…",
   chips,
   className,
   compact = false,

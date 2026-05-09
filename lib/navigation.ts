@@ -17,21 +17,26 @@ export type NavigationItem = {
 };
 
 export function getNavigationForRole(role: "owner" | "manager" | "member"): NavigationItem[] {
-  const base: NavigationItem[] = [
-    { href: "/", label: "My Day", icon: LayoutDashboard },
+  if (role === "member") {
+    return [
+      { href: "/my-day", label: "My Day", icon: LayoutDashboard },
+      { href: "/clients", label: "My Clients", icon: Users },
+      { href: "/projects", label: "My Projects", icon: FolderKanban },
+      { href: "/tasks", label: "My Tasks", icon: ListTodo },
+      { href: "/promises", label: "Promises", icon: Handshake },
+      { href: "/settings", label: "Settings", icon: Settings },
+    ];
+  }
+
+  return [
+    { href: "/manager", label: "Command Center", icon: LayoutDashboard },
+    { href: "/team", label: "Team", icon: Users },
     { href: "/clients", label: "Clients", icon: Users },
     { href: "/projects", label: "Projects", icon: FolderKanban },
     { href: "/tasks", label: "Tasks", icon: ListTodo },
     { href: "/radar", label: "Radar", icon: Radar },
     { href: "/promises", label: "Promises", icon: Handshake },
-    { href: "/settings", label: "Settings", icon: Settings },
-  ];
-
-  if (role === "member") return base;
-
-  return [
-    ...base.slice(0, 6),
     { href: "/reports", label: "Reports", icon: BarChart3 },
-    ...base.slice(6),
+    { href: "/settings", label: "Settings", icon: Settings },
   ];
 }

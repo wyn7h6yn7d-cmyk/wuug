@@ -4,9 +4,9 @@ import { SurfaceCard } from "@/components/ui/surface-card";
 export default function ManagerPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Juht" subtitle="Peagi. Siin tuleb juhtpaneel ja ülevaated." />
+      <PageHeader title="Command Center" subtitle="Coming soon. This will become the manager cockpit." />
       <SurfaceCard className="p-6 text-sm text-slate-600">
-        See vaade on ajutiselt lihtsustatud, et hoida build stabiilne.
+        This view is temporarily simplified to keep the build stable.
       </SurfaceCard>
     </div>
   );

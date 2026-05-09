@@ -5,10 +5,12 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { BrandLogo } from "./brand-logo";
 import { getNavigationForRole } from "@/lib/navigation";
+import { useAuth } from "@/components/providers/auth-provider";
 
 export function SidebarNav() {
   const pathname = usePathname();
-  const navigationItems = getNavigationForRole("member");
+  const { role } = useAuth();
+  const navigationItems = getNavigationForRole(role ?? "member");
 
   return (
     <aside className="hidden w-full rounded-[32px] border border-white/60 bg-white/45 p-5 shadow-[0_22px_60px_rgba(15,23,42,0.10)] backdrop-blur-xl ring-1 ring-slate-900/[0.04] lg:sticky lg:top-6 lg:block lg:h-[calc(100vh-3rem)]">

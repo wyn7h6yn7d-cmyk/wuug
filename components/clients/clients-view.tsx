@@ -43,16 +43,16 @@ type ClientsViewProps = {
 export function ClientsView({ clients, metrics }: ClientsViewProps) {
   const selectedClient = clients[0];
   const clientMetrics = [
-    { title: "Aktiivsed kliendid", value: String(metrics.active), tone: "blue" as const },
-    { title: "Vajavad vastust", value: String(metrics.needsResponse), tone: "violet" as const },
-    { title: "Kõrge prioriteet", value: String(metrics.highPriority), tone: "orange" as const },
-    { title: "Ilma järgmise sammuta", value: String(metrics.noNextStep), tone: "neutral" as const },
+    { title: "Active clients", value: String(metrics.active), tone: "blue" as const },
+    { title: "Waiting for response", value: String(metrics.needsResponse), tone: "violet" as const },
+    { title: "High priority", value: String(metrics.highPriority), tone: "orange" as const },
+    { title: "No next step", value: String(metrics.noNextStep), tone: "neutral" as const },
   ];
 
   return (
     <div className="space-y-6 pb-8">
       <FadeIn>
-        <PageHeader title="Kliendid" subtitle="Kõik kliendid ja nende järgmised sammud ühes selges vaates." />
+        <PageHeader title="Clients" subtitle="All clients and their next steps in one clean view." />
       </FadeIn>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -81,7 +81,7 @@ export function ClientsView({ clients, metrics }: ClientsViewProps) {
                 <Search className="h-4 w-4 text-slate-500" />
                 <input
                   type="text"
-                  placeholder="Otsi klienti..."
+                  placeholder="Search clients…"
                   className="w-full bg-transparent text-sm text-slate-800 placeholder:text-slate-500 focus:outline-none"
                 />
               </div>
@@ -95,7 +95,9 @@ export function ClientsView({ clients, metrics }: ClientsViewProps) {
                 >
                   <div className="min-w-0">
                     <p className="truncate font-medium text-slate-900">{client.name}</p>
-                    {!client.hasNextStep ? <StatusBadge label="Järgmine samm puudub" tone="orange" className="mt-2" /> : null}
+                    {!client.hasNextStep ? (
+                      <StatusBadge label="No next step" tone="orange" className="mt-2" />
+                    ) : null}
                   </div>
                   <div className="min-w-0 text-sm text-slate-700">
                     <p className="truncate font-medium text-slate-900">{client.contactName}</p>
@@ -105,7 +107,9 @@ export function ClientsView({ clients, metrics }: ClientsViewProps) {
                   <div className="text-sm text-slate-800">{client.hasNextStep ? client.nextStep : "-"}</div>
                   <div className="text-sm text-slate-700">{client.due}</div>
                   <div className="text-sm text-slate-700">{client.owner}</div>
-                  <GradientButton size="sm" variant="secondary">Ava</GradientButton>
+                  <GradientButton size="sm" variant="secondary">
+                    Open
+                  </GradientButton>
                 </article>
               ))}
             </div>
@@ -126,13 +130,13 @@ export function ClientsView({ clients, metrics }: ClientsViewProps) {
               </div>
 
               <div className="rounded-2xl border border-white/70 bg-white/55 p-4 shadow-sm ring-1 ring-slate-900/[0.03]">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Järgmine samm</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Next step</p>
                 <p className="mt-1 text-sm font-semibold text-slate-900">{selectedClient.nextStep || "—"}</p>
                 <p className="mt-1 text-xs text-slate-600">{selectedClient.due}</p>
               </div>
 
               <button className="inline-flex w-full items-center justify-center gap-1 rounded-[22px] bg-[linear-gradient(90deg,rgba(99,102,241,1)_0%,rgba(168,85,247,1)_45%,rgba(20,184,166,1)_100%)] px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_44px_rgba(99,102,241,0.22)] hover:opacity-95 active:scale-[0.99]">
-                Ava tegevus <ChevronRight className="h-4 w-4" />
+                Open action <ChevronRight className="h-4 w-4" />
               </button>
             </GlassCard>
           </FadeIn>

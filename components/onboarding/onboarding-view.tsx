@@ -37,7 +37,7 @@ export function OnboardingView() {
 
           <div className="mt-5 flex flex-wrap gap-2">
             <Link
-              href="/"
+              href="/app"
               className="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800"
             >
               Go to dashboard <ArrowRight className="ml-2 h-4 w-4" />

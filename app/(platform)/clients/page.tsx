@@ -1,15 +1,60 @@
-import { SectionPlaceholderView } from "@/components/platform/section-placeholder-view";
+import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
+import { ClientsPageClient } from "@/components/clients/clients-page-client";
+import type { AppRole } from "@/lib/permissions";
 
 export default function ClientsPage() {
+  return <ClientsPageServer />;
+}
+
+async function ClientsPageServer() {
+  const supabase = createClient(await cookies());
+  const { data: userData } = await supabase.auth.getUser();
+  const user = userData.user;
+
+  // Platform layout already enforces auth, but keep this safe.
+  if (!user) {
+    return <ClientsPageClient initialClients={[]} owners={[]} role={"member"} profileId={""} />;
+  }
+
+  const { data: profileRow } = await supabase
+    .from("profiles")
+    .select("id, organization_id, role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const role = ((profileRow?.role as AppRole | undefined) ?? "member") as AppRole;
+  const profileId = profileRow?.id ?? user.id;
+
+  // Owners list for manager UI.
+  const { data: ownerRows } = await supabase
+    .from("profiles")
+    .select("id, full_name, role")
+    .order("full_name", { ascending: true });
+
+  const owners =
+    ownerRows?.map((p) => ({
+      id: p.id as string,
+      label: `${p.full_name}${p.role ? ` • ${p.role}` : ""}`,
+    })) ?? [];
+
+  let query = supabase
+    .from("clients")
+    .select("id,name,contact_name,email,phone,status,health,priority,note,next_step,next_step_due_at,owner_id,created_at")
+    .order("created_at", { ascending: false });
+
+  if (role === "member") {
+    query = query.eq("owner_id", profileId);
+  }
+
+  const { data: clientRows } = await query;
+
   return (
-    <SectionPlaceholderView
-      title="Clients"
-      subtitle="Clients, next steps, and ownership — connected to real data next."
-      highlights={[
-        "Assign owners + next steps (coming next)",
-        "Member view: only your clients (coming next)",
-        "Health + priority signals (coming next)",
-      ]}
+    <ClientsPageClient
+      initialClients={(clientRows ?? []) as Parameters<typeof ClientsPageClient>[0]["initialClients"]}
+      owners={owners}
+      role={role}
+      profileId={profileId}
     />
   );
 }

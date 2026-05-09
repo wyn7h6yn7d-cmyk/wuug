@@ -3,12 +3,12 @@ import { SectionPlaceholderView } from "@/components/platform/section-placeholde
 export default function ProjectsPage() {
   return (
     <SectionPlaceholderView
-      title="Projektid"
-      subtitle="Projektid uues command-center vaates — selge, rahulik, tegutsetav."
+      title="Projects"
+      subtitle="Projects in a calm command-center view — clear, actionable, lightweight."
       highlights={[
-        "2 projekti on vaikse riskiga",
-        "3 projekti ootavad kliendi kinnitust",
-        "1 projekt vajab omanikku",
+        "2 projects have quiet risk",
+        "3 projects are waiting on client approval",
+        "1 project needs an owner",
       ]}
     />
   );

@@ -53,7 +53,7 @@ function ModalShell({
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="w-full max-w-2xl rounded-[28px] border border-[#E5EAF3] bg-white p-6 shadow-[0_18px_44px_rgba(66,86,122,0.18)]"
+            className="w-full max-w-2xl overflow-y-auto rounded-[28px] border border-[#E5EAF3] bg-white p-6 shadow-[0_18px_44px_rgba(66,86,122,0.18)] max-h-[85vh]"
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}

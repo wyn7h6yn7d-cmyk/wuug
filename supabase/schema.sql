@@ -275,7 +275,7 @@ begin
     v_org_id,
     coalesce(nullif(p_full_name, ''), split_part(v_email, '@', 1)),
     v_email,
-    'owner'
+    'manager'
   )
   on conflict (id) do update set
     organization_id = excluded.organization_id,

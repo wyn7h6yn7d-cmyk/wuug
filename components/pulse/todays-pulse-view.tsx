@@ -8,44 +8,44 @@ import { BentoGrid, BentoItem } from "@/components/command-center/bento-grid";
 import { RadarVisual } from "@/components/command-center/radar-visual";
 
 const commandChips = [
-  { key: "email", label: "Kirjuta e-kiri Nordic OÜ-le" },
-  { key: "next", label: "Mis on järgmine parim samm?" },
-  { key: "radar", label: "Näita riskiradarit" },
-  { key: "plan", label: "Tee päevaplaan 25 minutiga" },
+  { key: "email", label: "Draft an email to Nordic OÜ" },
+  { key: "next", label: "What’s the next best step?" },
+  { key: "radar", label: "Show the risk radar" },
+  { key: "plan", label: "Create a 25‑minute plan" },
 ];
 
 const nextBestAction = {
-  title: "Saada pakkumine Nordic OÜ-le",
-  context: "Tähtaeg täna 11:00 • Ootab kinnitust enne arenduse alustamist",
-  why: "Kui see läheb täna välja, avad reaalse liikumise ja vähendad 2 seotud riski.",
+  title: "Send proposal to Nordic OÜ",
+  context: "Due today 11:00 • Waiting for approval before development starts",
+  why: "If this goes out today, you unlock forward momentum and reduce two linked risks.",
 };
 
 const waitingMe = [
-  { label: "2 kinnitamist", meta: "disainivariandid", tone: "warn" as const },
-  { label: "1 otsus", meta: "projektisuund", tone: "neutral" as const },
-  { label: "1 ülevaatus", meta: "lepingu mustand", tone: "warn" as const },
+  { label: "2 approvals", meta: "design variants", tone: "warn" as const },
+  { label: "1 decision", meta: "project direction", tone: "neutral" as const },
+  { label: "1 review", meta: "contract draft", tone: "warn" as const },
 ];
 
 const waitingClient = [
-  { label: "3 vastust", meta: "kliendilt", tone: "calm" as const },
-  { label: "2 kinnitust", meta: "tähtaegadele", tone: "warn" as const },
+  { label: "3 replies", meta: "from clients", tone: "calm" as const },
+  { label: "2 approvals", meta: "deadlines", tone: "warn" as const },
 ];
 
 const promises = [
-  { label: "4 lubadust", meta: "aegumas 7 päeva", tone: "warn" as const },
-  { label: "2 lubadust", meta: "hilinenud", tone: "risk" as const },
+  { label: "4 promises", meta: "due within 7 days", tone: "warn" as const },
+  { label: "2 promises", meta: "overdue", tone: "risk" as const },
 ];
 
 const timeline = [
-  { time: "09:30", title: "Kohtumine: Greenfield OÜ", meta: "30 min" },
-  { time: "11:00", title: "Pakkumine: Nordic OÜ", meta: "tänane fookus" },
-  { time: "14:00", title: "Kõne: Lumen OÜ", meta: "täpsusta ulatus" },
+  { time: "09:30", title: "Meeting: Greenfield OÜ", meta: "30 min" },
+  { time: "11:00", title: "Proposal: Nordic OÜ", meta: "today’s focus" },
+  { time: "14:00", title: "Call: Lumen OÜ", meta: "clarify scope" },
 ];
 
 const noNextStep = [
-  { label: "Põhjanael Stuudio", meta: "viimane kontakt 8 päeva" },
-  { label: "Wave OÜ", meta: "projektil pole omanikku" },
-  { label: "Buildit OÜ", meta: "ootab sisendit" },
+  { label: "Põhjanael Studio", meta: "last contact 8 days ago" },
+  { label: "Wave OÜ", meta: "project has no owner" },
+  { label: "Buildit OÜ", meta: "waiting for input" },
 ];
 
 export function TodaysPulseView() {
@@ -55,30 +55,34 @@ export function TodaysPulseView() {
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
-              Tere, Eleonora
+              Today
             </h1>
-            <PulseBadge label="Tänane pulss" tone="calm" />
+            <PulseBadge label="Today pulse" tone="calm" />
           </div>
           <p className="mt-2 text-sm text-slate-600">
-            Sul on täna <span className="font-semibold text-slate-900">3 asja</span>, mis päriselt loevad.
+            You have <span className="font-semibold text-slate-900">3 things</span> that truly matter today.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <GradientButton variant="secondary">
-            <Sparkles className="h-4 w-4" />
-            Tee plaan
-          </GradientButton>
-          <GradientButton>
-            <ListChecks className="h-4 w-4" />
-            Ava fookus
-          </GradientButton>
+          <Link href="/tasks">
+            <GradientButton variant="secondary">
+              <Sparkles className="h-4 w-4" />
+              Create plan
+            </GradientButton>
+          </Link>
+          <Link href="/tasks">
+            <GradientButton>
+              <ListChecks className="h-4 w-4" />
+              Open focus
+            </GradientButton>
+          </Link>
         </div>
       </div>
 
       <GlassCard className="p-5">
         <CommandBar
-          placeholder="Küsi wuugilt või otsi klienti, projekti, tegevust…"
+          placeholder="Ask wuug or search clients, projects, tasks…"
           chips={commandChips}
         />
       </GlassCard>
@@ -92,8 +96,8 @@ export function TodaysPulseView() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h2 className="text-xl font-semibold text-slate-900">Järgmine parim tegevus</h2>
-                        <PulseBadge label="AI soovitus" tone="neutral" />
+                        <h2 className="text-xl font-semibold text-slate-900">Next best action</h2>
+                        <PulseBadge label="AI suggestion" tone="neutral" />
                       </div>
                       <p className="mt-1 text-sm text-slate-600">{nextBestAction.why}</p>
                     </div>
@@ -109,18 +113,18 @@ export function TodaysPulseView() {
 
                   <div className="flex flex-wrap gap-2">
                     <GradientButton size="sm">
-                      Ava <ArrowRight className="h-4 w-4" />
+                      Open <ArrowRight className="h-4 w-4" />
                     </GradientButton>
                     <GradientButton size="sm" variant="secondary">
                       <CheckCircle2 className="h-4 w-4" />
-                      Märgi tehtuks
+                      Mark done
                     </GradientButton>
                     <GradientButton size="sm" variant="ghost">
-                      Lükka edasi
+                      Snooze
                     </GradientButton>
                     <GradientButton size="sm" variant="secondary">
                       <Mail className="h-4 w-4" />
-                      Loo e-kiri AI-ga
+                      Draft email with AI
                     </GradientButton>
                   </div>
                 </div>
@@ -133,10 +137,10 @@ export function TodaysPulseView() {
                   <div>
                     <h2 className="text-xl font-semibold text-slate-900">Risk Radar</h2>
                     <p className="mt-1 text-sm text-slate-600">
-                      6 asja on vaikse riskiga — tõsta need enne, kui muutuvad kiireks tulekahjuks.
+                      6 items have quiet risk — lift them before they turn into a fire drill.
                     </p>
                   </div>
-                  <PulseBadge label="Tähelepanu" tone="warn" />
+                  <PulseBadge label="Attention" tone="warn" />
                 </div>
 
                 <div className="mt-4 grid items-center gap-4 md:grid-cols-[180px_1fr]">
@@ -151,10 +155,10 @@ export function TodaysPulseView() {
                   />
                   <div className="space-y-2">
                     {[
-                      { label: "Seisab", meta: "5 klienti", tone: "warn" as const },
-                      { label: "Riskis", meta: "2 projekti", tone: "risk" as const },
-                      { label: "Aegub", meta: "4 lubadust", tone: "warn" as const },
-                      { label: "Omanik puudub", meta: "3 kirjet", tone: "neutral" as const },
+                      { label: "Stuck", meta: "5 clients", tone: "warn" as const },
+                      { label: "At risk", meta: "2 projects", tone: "risk" as const },
+                      { label: "Due soon", meta: "4 promises", tone: "warn" as const },
+                      { label: "Missing owner", meta: "3 items", tone: "neutral" as const },
                     ].map((item) => (
                       <div
                         key={item.label}
@@ -166,7 +170,7 @@ export function TodaysPulseView() {
                     ))}
                     <Link href="/radar" className="block">
                       <GradientButton className="w-full" variant="secondary">
-                        Ava radar <ArrowRight className="h-4 w-4" />
+                        Open radar <ArrowRight className="h-4 w-4" />
                       </GradientButton>
                     </Link>
                   </div>
@@ -176,7 +180,7 @@ export function TodaysPulseView() {
 
             <BentoItem className="xl:col-span-4">
               <GlassCard className="p-6">
-                <h3 className="text-base font-semibold text-slate-900">Ootab meid</h3>
+                <h3 className="text-base font-semibold text-slate-900">Waiting on us</h3>
                 <div className="mt-3 space-y-2">
                   {waitingMe.map((item) => (
                     <div
@@ -193,7 +197,7 @@ export function TodaysPulseView() {
 
             <BentoItem className="xl:col-span-4">
               <GlassCard className="p-6">
-                <h3 className="text-base font-semibold text-slate-900">Ootab klienti</h3>
+                <h3 className="text-base font-semibold text-slate-900">Waiting on client</h3>
                 <div className="mt-3 space-y-2">
                   {waitingClient.map((item) => (
                     <div
@@ -210,7 +214,7 @@ export function TodaysPulseView() {
 
             <BentoItem className="xl:col-span-4">
               <GlassCard className="p-6">
-                <h3 className="text-base font-semibold text-slate-900">Lubadused</h3>
+                <h3 className="text-base font-semibold text-slate-900">Promises</h3>
                 <div className="mt-3 space-y-2">
                   {promises.map((item) => (
                     <div
@@ -227,7 +231,7 @@ export function TodaysPulseView() {
 
             <BentoItem className="xl:col-span-7">
               <GlassCard className="p-6">
-                <h3 className="text-base font-semibold text-slate-900">Tänane ajajoon</h3>
+                <h3 className="text-base font-semibold text-slate-900">Today timeline</h3>
                 <div className="mt-4 space-y-2">
                   {timeline.map((item) => (
                     <div
@@ -240,7 +244,7 @@ export function TodaysPulseView() {
                         <div className="truncate text-xs text-slate-500">{item.meta}</div>
                       </div>
                       <GradientButton variant="ghost" size="sm" className="justify-self-start md:justify-self-end">
-                        Ava <ArrowRight className="h-4 w-4" />
+                        Open <ArrowRight className="h-4 w-4" />
                       </GradientButton>
                     </div>
                   ))}
@@ -250,9 +254,9 @@ export function TodaysPulseView() {
 
             <BentoItem className="xl:col-span-5">
               <GlassCard className="p-6">
-                <h3 className="text-base font-semibold text-slate-900">Ilma järgmise sammuta</h3>
+                <h3 className="text-base font-semibold text-slate-900">No next step</h3>
                 <p className="mt-1 text-sm text-slate-600">
-                  Need vajavad ühte otsust — isegi kui see on “oota”.
+                  Each needs a single decision — even if it’s “wait”.
                 </p>
                 <div className="mt-3 space-y-2">
                   {noNextStep.map((item) => (
@@ -265,7 +269,7 @@ export function TodaysPulseView() {
                         <div className="text-xs text-slate-500">{item.meta}</div>
                       </div>
                       <GradientButton variant="secondary" size="sm">
-                        Lisa samm
+                        Add step
                       </GradientButton>
                     </div>
                   ))}
@@ -281,7 +285,7 @@ export function TodaysPulseView() {
               <div>
                 <div className="text-sm font-semibold text-slate-900">wuug assistant</div>
                 <p className="mt-1 text-sm text-slate-600">
-                  Ütle üks lause — ma vormistan tegevused, lubadused ja sõnumid.
+                  Say one sentence — I’ll format actions, promises, and messages.
                 </p>
               </div>
               <PulseBadge label="AI" tone="neutral" />
@@ -289,9 +293,9 @@ export function TodaysPulseView() {
 
             <div className="mt-4 space-y-2">
               {[
-                "Koosta e-kiri Nordic OÜ-le: pakkumine + järgmine samm.",
-                "Tuvasta 3 kirjet, millel puudub omanik, ja määra vastutaja.",
-                "Koosta 25-minutiline päevaplaan koos 2 pausiga.",
+                "Draft an email to Nordic OÜ: proposal + next step.",
+                "Find 3 items missing an owner and assign responsibility.",
+                "Create a 25‑minute plan with two breaks.",
               ].map((suggestion) => (
                 <button
                   key={suggestion}
@@ -306,9 +310,9 @@ export function TodaysPulseView() {
             <div className="mt-4 grid gap-2">
               <GradientButton>
                 <Sparkles className="h-4 w-4" />
-                Tee plaan
+                Create plan
               </GradientButton>
-              <GradientButton variant="secondary">Ava soovitused</GradientButton>
+              <GradientButton variant="secondary">Open suggestions</GradientButton>
             </div>
           </GlassCard>
         </aside>
