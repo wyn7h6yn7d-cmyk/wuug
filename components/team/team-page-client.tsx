@@ -184,10 +184,11 @@ export function TeamPageClient({
                           <button
                             type="button"
                             disabled={busy}
+                            aria-label={`Copy invite link for ${inv.email}`}
                             onClick={async () => {
                               try {
                                 await navigator.clipboard.writeText(link);
-                                toast("Invite link copied.");
+                                toast("Invite link copied to clipboard.");
                               } catch {
                                 toast("Could not copy link.");
                               }
@@ -195,7 +196,7 @@ export function TeamPageClient({
                             className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 disabled:opacity-60"
                           >
                             <Copy className="h-4 w-4" />
-                            Copy link
+                            Copy invite link
                           </button>
                         ) : null}
                         <button
@@ -209,11 +210,6 @@ export function TeamPageClient({
                         </button>
                       </div>
                     </div>
-                    {link ? (
-                      <div className="mt-2 break-all rounded-2xl border border-white/70 bg-white/60 px-3 py-2 text-xs text-slate-600">
-                        {link}
-                      </div>
-                    ) : null}
                   </div>
                 );
               })
@@ -227,9 +223,10 @@ export function TeamPageClient({
           <div className="w-full max-w-lg overflow-y-auto rounded-[28px] border border-[#E5EAF3] bg-white p-6 shadow-[0_18px_44px_rgba(66,86,122,0.18)] max-h-[85vh]">
             <div className="text-lg font-semibold text-slate-900">Invite team member</div>
             <div className="mt-1 text-sm text-slate-600">
-              We’ll create an invite and show a link to <span className="font-medium">/register</span>. Wuug does{" "}
-              <span className="font-medium">not</span> email it—you copy the link and send it yourself (Slack, iMessage,
-              etc.). The invite email must match the address they use to sign up.
+              We’ll create an invite and copy the link to your clipboard once. The URL is never shown on screen—use{" "}
+              <span className="font-medium">Copy invite link</span> under Pending invitations if you need it again. Wuug
+              does <span className="font-medium">not</span> email it. The invite email must match the address they use to
+              sign up.
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
