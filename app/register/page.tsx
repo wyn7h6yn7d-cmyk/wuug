@@ -9,7 +9,14 @@ import { OrbBackground } from "@/components/command-center/orb-background";
 import { GlassCard } from "@/components/command-center/glass-card";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { AuthSubmitButton } from "@/components/auth/auth-submit-button";
+import { PENDING_INVITE_KEY } from "@/components/auth/login-form";
 import { createClient } from "@/lib/supabase/client";
+
+function formatAuthError(message: string | undefined): string {
+  const t = (message ?? "").trim();
+  if (!t) return "Registration failed. Please check your details and try again.";
+  return t.length > 220 ? `${t.slice(0, 217)}…` : t;
+}
 
 type InviteInfo = {
   organization_id: string;
@@ -113,6 +120,11 @@ function RegisterPageInner() {
                 <span>
                   You’re joining <span className="font-semibold">{invite.organization_name}</span> as{" "}
                   <span className="font-semibold">{invite.role === "manager" ? "Manager" : "Team Member"}</span>.
+                  <span className="mt-2 block text-xs text-slate-600">
+                    Wuug does not email this link—whoever invited you should send it (Slack, text, etc.). If your project
+                    uses Supabase email confirmation, check your inbox and spam for a message from Supabase after you
+                    register.
+                  </span>
                 </span>
               ) : null}
             </div>
@@ -152,12 +164,11 @@ function RegisterPageInner() {
                 });
 
                 if (signUpError) {
-                  setFormError("Registration failed. Please check your details and try again.");
+                  setFormError(formatAuthError(signUpError.message));
                   setIsSubmitting(false);
                   return;
                 }
 
-                // If email confirmations are enabled, there may be no session yet.
                 if (inviteToken && signUpData.session) {
                   const { data: acceptData, error: acceptError } = await supabase.rpc("accept_invitation", {
                     p_token: inviteToken,
@@ -165,7 +176,7 @@ function RegisterPageInner() {
                   });
 
                   if (acceptError) {
-                    setFormError("Invite acceptance failed. Please contact your manager for a new invite link.");
+                    setFormError(formatAuthError(acceptError.message));
                     setIsSubmitting(false);
                     return;
                   }
@@ -175,9 +186,18 @@ function RegisterPageInner() {
                   return;
                 }
 
-                // If email confirmations are enabled, there may be no session yet.
                 if (!signUpData.session) {
-                  router.replace("/login?confirm=1");
+                  if (inviteToken && typeof window !== "undefined") {
+                    try {
+                      sessionStorage.setItem(PENDING_INVITE_KEY, inviteToken);
+                    } catch {
+                      /* private mode */
+                    }
+                  }
+                  const next = inviteToken
+                    ? `/login?confirm=1&invite=${encodeURIComponent(inviteToken)}`
+                    : "/login?confirm=1";
+                  router.replace(next);
                 } else {
                   router.replace("/login?created=1");
                 }

@@ -2,10 +2,9 @@ import Link from "next/link";
 import { BrandLogo } from "@/components/layout/brand-logo";
 import { OrbBackground } from "@/components/command-center/orb-background";
 import { GlassCard } from "@/components/command-center/glass-card";
-import { signIn } from "@/app/(auth)/actions";
 import { ResendConfirmation } from "@/components/auth/resend-confirmation";
+import { LoginForm } from "@/components/auth/login-form";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { AuthSubmitButton } from "@/components/auth/auth-submit-button";
 import { safeDecodeURIComponent } from "@/lib/safe-decode";
 
 export default async function LoginPage({
@@ -18,6 +17,9 @@ export default async function LoginPage({
   const confirm = params.confirm === "1";
   const error = params.error === "1";
   const msg = safeDecodeURIComponent(params.msg);
+  const inviteRaw = params.invite;
+  const inviteFromQuery =
+    typeof inviteRaw === "string" ? inviteRaw : Array.isArray(inviteRaw) ? (inviteRaw[0] ?? null) : null;
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-app text-fg">
@@ -39,7 +41,13 @@ export default async function LoginPage({
           ) : null}
           {confirm ? (
             <div className="mt-4 rounded-2xl border border-[rgb(var(--accent)/0.35)] bg-[rgb(var(--accent)/0.10)] p-3 text-sm text-[rgb(var(--accent))]">
-              Check your email to confirm your account, then come back to sign in.
+              <p>Check your email to confirm your account (and spam/junk), then sign in here with the same address.</p>
+              {inviteFromQuery ? (
+                <p className="mt-2 text-xs text-fg-soft">
+                  Your invite is saved for this browser session—after confirming, sign in on this device to finish joining
+                  the workspace.
+                </p>
+              ) : null}
             </div>
           ) : null}
           {error ? (
@@ -49,31 +57,7 @@ export default async function LoginPage({
             </div>
           ) : null}
 
-          <form action={signIn} className="mt-5 space-y-3">
-            <label className="block">
-              <span className="mb-1.5 block text-sm font-medium text-fg-muted">Email</span>
-              <input
-                name="email"
-                type="email"
-                required
-                placeholder="name@company.com"
-                className="w-full rounded-2xl border border-token-soft bg-surface/70 px-3 py-2.5 text-sm text-fg placeholder:text-fg-soft focus:outline-none"
-              />
-            </label>
-
-            <label className="block">
-              <span className="mb-1.5 block text-sm font-medium text-fg-muted">Password</span>
-              <input
-                name="password"
-                type="password"
-                required
-                placeholder="••••••••"
-                className="w-full rounded-2xl border border-token-soft bg-surface/70 px-3 py-2.5 text-sm text-fg placeholder:text-fg-soft focus:outline-none"
-              />
-            </label>
-
-            <AuthSubmitButton variant="sign-in" />
-          </form>
+          <LoginForm inviteFromQuery={inviteFromQuery} />
 
           <p className="mt-4 text-sm text-fg-muted">
             No account?{" "}

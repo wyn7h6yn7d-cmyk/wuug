@@ -227,7 +227,9 @@ export function TeamPageClient({
           <div className="w-full max-w-lg overflow-y-auto rounded-[28px] border border-[#E5EAF3] bg-white p-6 shadow-[0_18px_44px_rgba(66,86,122,0.18)] max-h-[85vh]">
             <div className="text-lg font-semibold text-slate-900">Invite team member</div>
             <div className="mt-1 text-sm text-slate-600">
-              We’ll generate an invite link for /register. You can share it with your teammate.
+              We’ll create an invite and show a link to <span className="font-medium">/register</span>. Wuug does{" "}
+              <span className="font-medium">not</span> email it—you copy the link and send it yourself (Slack, iMessage,
+              etc.). The invite email must match the address they use to sign up.
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2">

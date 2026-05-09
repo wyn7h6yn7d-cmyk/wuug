@@ -12,10 +12,14 @@ function encodeErr(message: string) {
 export async function signIn(formData: FormData) {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
+  const inviteToken = String(formData.get("invite") ?? "").trim();
 
   const supabase = createClient(await cookies());
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) redirect(`/login?error=1&msg=${encodeErr(error.message)}`);
+  if (error) {
+    const inviteQ = inviteToken ? `&invite=${encodeURIComponent(inviteToken)}` : "";
+    redirect(`/login?error=1&msg=${encodeErr(error.message)}${inviteQ}`);
+  }
 
   // Route by role.
   const { data: userData } = await supabase.auth.getUser();
@@ -24,11 +28,33 @@ export async function signIn(formData: FormData) {
 
   const { data: profileRow } = await supabase
     .from("profiles")
+    .select("role, organization_id")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (inviteToken && !profileRow?.organization_id) {
+    const meta = user.user_metadata as { full_name?: string } | undefined;
+    const fullName =
+      typeof meta?.full_name === "string" && meta.full_name.trim()
+        ? meta.full_name.trim()
+        : email.split("@")[0] ?? "Member";
+    const { error: acceptError } = await supabase.rpc("accept_invitation", {
+      p_token: inviteToken,
+      p_full_name: fullName,
+    });
+    if (acceptError) {
+      const inviteQ = inviteToken ? `&invite=${encodeURIComponent(inviteToken)}` : "";
+      redirect(`/login?error=1&msg=${encodeErr(acceptError.message)}${inviteQ}`);
+    }
+  }
+
+  const { data: profileAfter } = await supabase
+    .from("profiles")
     .select("role")
     .eq("id", user.id)
     .maybeSingle();
 
-  const role = (profileRow?.role as string | undefined) ?? "member";
+  const role = (profileAfter?.role as string | undefined) ?? "member";
   redirect(role === "member" ? "/my-day" : "/manager");
 }
 
