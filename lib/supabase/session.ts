@@ -1,6 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
+function isAuthRoute(pathname: string) {
+  return pathname === "/login" || pathname === "/signup" || pathname === "/register";
+}
+
 export async function updateSession(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -38,7 +42,16 @@ export async function updateSession(request: NextRequest) {
   });
 
   // Refresh session if needed; do not enforce redirects yet.
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Redirect authenticated users away from auth pages.
+  if (user && isAuthRoute(request.nextUrl.pathname)) {
+    const nextUrl = request.nextUrl.clone();
+    nextUrl.pathname = "/";
+    return NextResponse.redirect(nextUrl);
+  }
 
   return response;
 }

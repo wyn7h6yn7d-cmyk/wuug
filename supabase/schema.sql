@@ -49,6 +49,50 @@ $$;
 -- Invitation helpers
 -- ============================================================================
 
+-- Create a new workspace (organization + owner profile) for the authenticated user.
+-- This is used for first-time registration. We keep RLS tight and do this via a SECURITY DEFINER.
+create or replace function public.create_workspace(p_organization_name text, p_full_name text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_org_id uuid;
+  v_email text;
+begin
+  if auth.uid() is null then
+    raise exception 'not_authenticated';
+  end if;
+
+  v_email := lower(coalesce(auth.jwt() ->> 'email', ''));
+  if v_email = '' then
+    raise exception 'missing_email';
+  end if;
+
+  insert into public.organizations (name)
+  values (coalesce(nullif(p_organization_name, ''), 'My workspace'))
+  returning id into v_org_id;
+
+  insert into public.profiles (id, organization_id, full_name, email, role)
+  values (
+    auth.uid(),
+    v_org_id,
+    coalesce(nullif(p_full_name, ''), split_part(v_email, '@', 1)),
+    v_email,
+    'owner'
+  )
+  on conflict (id) do update set
+    organization_id = excluded.organization_id,
+    full_name = excluded.full_name,
+    email = excluded.email,
+    role = excluded.role,
+    updated_at = now();
+end;
+$$;
+
+grant execute on function public.create_workspace(text, text) to authenticated;
+
 -- Public, token-scoped read for invite-based registration.
 -- Exposes only non-sensitive fields and only for valid (unaccepted, unexpired) invitations.
 create or replace function public.get_invitation_public(p_token text)
