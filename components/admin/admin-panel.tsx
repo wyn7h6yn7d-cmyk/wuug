@@ -151,6 +151,19 @@ export function AdminPanel({
             Promote to manager only when the workspace has an invoice on file and an active subscription window (or use
             force).
           </p>
+          {!loadError && profiles.length === 0 ? (
+            <div className="mt-4 rounded-2xl border border-amber-500/35 bg-amber-500/10 p-4">
+              <p className="text-sm font-semibold text-fg">No rows returned</p>
+              <p className="mt-1 text-sm text-fg-soft">
+                Admin lists use <code className="rounded bg-surface/80 px-1">is_platform_admin()</code> in the database.
+                If you open this page as the master admin email but your profile row does not have{" "}
+                <code className="rounded bg-surface/80 px-1">platform_admin = true</code>, RPCs return nothing until you
+                apply{" "}
+                <code className="rounded bg-surface/80 px-1">20260209170000_platform_admin_master_session.sql</code>{" "}
+                (or run <code className="rounded bg-surface/80 px-1">supabase db push</code>), then refresh.
+              </p>
+            </div>
+          ) : null}
           <table className="mt-4 w-full min-w-[920px] border-separate border-spacing-0 text-left text-sm">
             <thead>
               <tr className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
