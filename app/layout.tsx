@@ -10,6 +10,10 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "wuug",
   description: "wuug shows what needs the next step.",
+  icons: {
+    icon: [{ url: "/icon.png", sizes: "512x512", type: "image/png" }],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({
