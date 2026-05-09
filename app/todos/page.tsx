@@ -1,6 +1,6 @@
 export default function Page() {
   const todos = [
-    { id: "t1", name: "This is a mock page (Supabase disabled)." },
+    { id: "t1", name: "Sample todo — this page is for quick checks." },
     { id: "t2", name: "Use /manager and role switching in the TopBar." },
   ];
 

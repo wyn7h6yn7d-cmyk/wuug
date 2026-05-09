@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { cookies } from "next/headers";
 import {
   AlertTriangle,
@@ -14,6 +13,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CommandBar } from "@/components/command-center/command-bar";
 import { GlassCard } from "@/components/command-center/glass-card";
 import { GradientButton } from "@/components/command-center/gradient-button";
+import { PressableLink } from "@/components/ui/pressable-link";
 import { InsightCard } from "@/components/command-center/insight-card";
 import { PageHeader } from "@/components/ui/page-header";
 import { PulseBadge } from "@/components/command-center/pulse-badge";
@@ -302,11 +302,9 @@ async function RadarServer() {
                         <PulseBadge label={meta.label} tone={meta.tone} />
                       </div>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <Link href={s.href}>
-                          <GradientButton size="sm">
-                            Open <ArrowRight className="h-4 w-4" />
-                          </GradientButton>
-                        </Link>
+                        <PressableLink href={s.href} variant="primary" size="sm">
+                          Open <ArrowRight className="h-4 w-4" />
+                        </PressableLink>
                         <button
                           type="button"
                           className="inline-flex h-9 items-center gap-1.5 rounded-2xl border border-token-soft bg-surface/70 px-3 text-xs font-semibold text-fg-muted hover:text-fg"

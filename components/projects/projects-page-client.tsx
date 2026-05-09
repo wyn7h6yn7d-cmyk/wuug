@@ -402,7 +402,7 @@ export function ProjectsPageClient({
     <div className="space-y-6 pb-8">
       <FadeIn>
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <PageHeader title="Projects" subtitle="Real projects from Supabase — create, track, and update status." />
+          <PageHeader title="Projects" subtitle="Create, track, and update status in one place." />
           <div className="flex items-center gap-2">
             {canManage ? (
               <button

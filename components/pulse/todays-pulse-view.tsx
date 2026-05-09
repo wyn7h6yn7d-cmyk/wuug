@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { Mail, ArrowRight, CheckCircle2, Clock3, Sparkles, ListChecks } from "lucide-react";
 import { CommandBar } from "@/components/command-center/command-bar";
 import { GlassCard } from "@/components/command-center/glass-card";
 import { GradientButton } from "@/components/command-center/gradient-button";
+import { PressableLink } from "@/components/ui/pressable-link";
 import { PulseBadge } from "@/components/command-center/pulse-badge";
 import { BentoGrid, BentoItem } from "@/components/command-center/bento-grid";
 import { RadarVisual } from "@/components/command-center/radar-visual";
@@ -65,18 +65,14 @@ export function TodaysPulseView() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link href="/tasks">
-            <GradientButton variant="secondary">
-              <Sparkles className="h-4 w-4" />
-              Create plan
-            </GradientButton>
-          </Link>
-          <Link href="/tasks">
-            <GradientButton>
-              <ListChecks className="h-4 w-4" />
-              Open focus
-            </GradientButton>
-          </Link>
+          <PressableLink href="/tasks" variant="secondary" size="sm">
+            <Sparkles className="h-4 w-4" />
+            Create plan
+          </PressableLink>
+          <PressableLink href="/tasks" variant="primary" size="sm">
+            <ListChecks className="h-4 w-4" />
+            Open focus
+          </PressableLink>
         </div>
       </div>
 
@@ -168,11 +164,9 @@ export function TodaysPulseView() {
                         <PulseBadge label={item.meta} tone={item.tone} />
                       </div>
                     ))}
-                    <Link href="/radar" className="block">
-                      <GradientButton className="w-full" variant="secondary">
-                        Open radar <ArrowRight className="h-4 w-4" />
-                      </GradientButton>
-                    </Link>
+                    <PressableLink href="/radar" variant="secondary" fullWidth>
+                      Open radar <ArrowRight className="h-4 w-4" />
+                    </PressableLink>
                   </div>
                 </div>
               </GlassCard>

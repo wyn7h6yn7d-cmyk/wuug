@@ -8,11 +8,11 @@ export function TeamPageView() {
   return (
     <div className="space-y-6 pb-10">
       <FadeIn>
-        <PageHeader title="Team" subtitle="Team overview (placeholder)." />
+        <PageHeader title="Team" subtitle="Roles, invites, and who’s on the team." />
       </FadeIn>
       <FadeIn delay={0.06}>
         <SurfaceCard className="p-6">
-          <p className="text-sm text-slate-600">Team UI is under construction.</p>
+          <p className="text-sm text-slate-600">More team tools are on the way.</p>
         </SurfaceCard>
       </FadeIn>
     </div>

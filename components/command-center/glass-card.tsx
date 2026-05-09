@@ -5,20 +5,31 @@ type GlassCardProps = {
   className?: string;
   as?: "section" | "div" | "article" | "aside";
   glow?: boolean;
+  /** Nearly opaque surface — use when stacking on other glass to avoid text bleed-through */
+  solid?: boolean;
 };
 
-export function GlassCard({ children, className, as = "section", glow = true }: GlassCardProps) {
+export function GlassCard({
+  children,
+  className,
+  as = "section",
+  glow = true,
+  solid = false,
+}: GlassCardProps) {
   const Component = as;
 
   return (
     <Component
       className={cn(
-        "relative overflow-hidden rounded-[28px] glass",
+        "relative overflow-hidden rounded-[28px]",
+        solid
+          ? "border border-token-soft bg-surface/96 shadow-[0_24px_60px_rgba(15,23,42,0.10)] backdrop-blur-xl dark:bg-[rgb(26_33_56/0.96)] dark:shadow-[0_28px_70px_rgba(0,0,0,0.5)]"
+          : "glass",
         "ring-1 ring-black/[0.04] dark:ring-white/[0.06]",
         className,
       )}
     >
-      {glow ? (
+      {glow && !solid ? (
         <div
           className="pointer-events-none absolute inset-0"
           style={{

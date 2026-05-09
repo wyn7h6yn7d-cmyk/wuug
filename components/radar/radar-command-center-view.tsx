@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { ArrowRight, Sparkles, UserRound, Timer, AlertTriangle, PauseCircle } from "lucide-react";
 import { GlassCard } from "@/components/command-center/glass-card";
 import { GradientButton } from "@/components/command-center/gradient-button";
+import { PressableLink } from "@/components/ui/pressable-link";
 import { PulseBadge } from "@/components/command-center/pulse-badge";
 import { RadarVisual } from "@/components/command-center/radar-visual";
 import { BentoGrid, BentoItem } from "@/components/command-center/bento-grid";
@@ -70,11 +70,9 @@ export function RadarCommandCenterView() {
             <Sparkles className="h-4 w-4" />
             AI suggestions
           </GradientButton>
-          <Link href="/app" className="hidden md:block">
-            <GradientButton>
-              Open today pulse <ArrowRight className="h-4 w-4" />
-            </GradientButton>
-          </Link>
+          <PressableLink href="/app" variant="primary" className="hidden md:inline-flex">
+            Open today pulse <ArrowRight className="h-4 w-4" />
+          </PressableLink>
         </div>
       </div>
 
@@ -121,7 +119,6 @@ export function RadarCommandCenterView() {
                     <h2 className="text-xl font-semibold text-slate-900">Signals</h2>
                     <p className="mt-1 text-sm text-slate-600">Cards, not tables. Clear, actionable, calm.</p>
                   </div>
-                  <PulseBadge label="Mock data" tone="neutral" />
                 </div>
 
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -146,9 +143,9 @@ export function RadarCommandCenterView() {
                         </div>
 
                         <div className="mt-3 flex flex-wrap gap-2">
-                          <Link href="/clients">
-                            <GradientButton size="sm">Open</GradientButton>
-                          </Link>
+                          <PressableLink href="/clients" variant="primary" size="sm">
+                            Open
+                          </PressableLink>
                           <GradientButton size="sm" variant="secondary">
                             Add next step
                           </GradientButton>

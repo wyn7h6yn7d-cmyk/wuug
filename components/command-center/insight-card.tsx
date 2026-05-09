@@ -12,8 +12,6 @@ type InsightCardProps = {
   meta?: string;
   tone?: "neutral" | "warn" | "risk" | "calm" | "accent";
   className?: string;
-  /** small floating offset for hero use */
-  float?: boolean;
 };
 
 const toneToColor: Record<NonNullable<InsightCardProps["tone"]>, string> = {
@@ -31,22 +29,13 @@ export function InsightCard({
   meta,
   tone = "neutral",
   className,
-  float = false,
 }: InsightCardProps) {
   const color = toneToColor[tone];
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
-      animate={
-        float
-          ? { opacity: 1, y: [0, -4, 0] }
-          : { opacity: 1, y: 0 }
-      }
-      transition={
-        float
-          ? { duration: 6, repeat: Infinity, ease: "easeInOut" }
-          : { duration: 0.35, ease: "easeOut" }
-      }
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
       whileHover={{ y: -2 }}
       className={cn(
         "relative overflow-hidden rounded-3xl border border-token-soft bg-surface/85 p-4 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur",
@@ -55,7 +44,7 @@ export function InsightCard({
       )}
     >
       <span
-        className="absolute -right-6 -top-6 h-20 w-20 rounded-full opacity-50 blur-2xl"
+        className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full opacity-40 blur-2xl"
         style={{ background: color }}
         aria-hidden
       />

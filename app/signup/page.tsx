@@ -4,6 +4,8 @@ import { OrbBackground } from "@/components/command-center/orb-background";
 import { GlassCard } from "@/components/command-center/glass-card";
 import { signUp } from "@/app/(auth)/actions";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { AuthSubmitButton } from "@/components/auth/auth-submit-button";
+import { safeDecodeURIComponent } from "@/lib/safe-decode";
 
 export default async function SignupPage({
   searchParams,
@@ -12,8 +14,7 @@ export default async function SignupPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const error = resolvedSearchParams?.error === "1";
-  const msgParam = resolvedSearchParams?.msg;
-  const msg = typeof msgParam === "string" ? decodeURIComponent(msgParam) : null;
+  const msg = safeDecodeURIComponent(resolvedSearchParams?.msg);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-app text-fg">
@@ -92,9 +93,7 @@ export default async function SignupPage({
               />
             </label>
 
-            <button className="mt-2 w-full rounded-2xl gradient-sheen px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(99,102,241,0.32)] hover:opacity-95 active:scale-[0.99]">
-              Create account
-            </button>
+            <AuthSubmitButton variant="sign-up" />
           </form>
 
           <p className="mt-4 text-sm text-fg-muted">

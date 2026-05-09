@@ -9,15 +9,17 @@ import {
   CheckCircle2,
   Clock,
   Handshake,
+  LogIn,
   Radar as RadarIcon,
   ShieldAlert,
   Sparkles,
+  UserPlus,
   Users,
   Zap,
 } from "lucide-react";
 import { CommandBar } from "@/components/command-center/command-bar";
 import { GlassCard } from "@/components/command-center/glass-card";
-import { GradientButton } from "@/components/command-center/gradient-button";
+import { PressableLink } from "@/components/ui/pressable-link";
 import { InsightCard } from "@/components/command-center/insight-card";
 import { NextBestAction } from "@/components/command-center/next-best-action";
 import { OrbBackground } from "@/components/command-center/orb-background";
@@ -43,17 +45,15 @@ export function LandingHero() {
         <BrandLogo />
         <nav className="flex items-center gap-2">
           <ThemeToggle size="sm" className="hidden sm:inline-flex" />
-          <Link
-            href="/login"
-            className="hidden rounded-2xl border border-token-soft bg-surface/70 px-4 py-2.5 text-sm font-semibold text-fg backdrop-blur hover:bg-surface sm:inline-flex"
-          >
+          <PressableLink href="/login" variant="secondary" size="sm" className="hidden sm:inline-flex">
+            <LogIn className="h-4 w-4" />
             Log in
-          </Link>
-          <Link href="/signup">
-            <GradientButton>
-              Register <ArrowRight className="h-4 w-4" />
-            </GradientButton>
-          </Link>
+          </PressableLink>
+          <PressableLink href="/signup" variant="primary" size="sm">
+            <UserPlus className="h-4 w-4" />
+            Register
+            <ArrowRight className="h-4 w-4" />
+          </PressableLink>
         </nav>
       </header>
 
@@ -101,7 +101,7 @@ export function LandingHero() {
               transition={{ duration: 0.55, delay: 0.1 }}
               className="mt-7"
             >
-              <CommandBar chips={heroChips} />
+              <CommandBar chips={heroChips} decorative />
             </motion.div>
 
             <motion.div
@@ -110,17 +110,15 @@ export function LandingHero() {
               transition={{ duration: 0.55, delay: 0.15 }}
               className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-center"
             >
-              <Link href="/signup">
-                <GradientButton className="w-full sm:w-auto">
-                  Create your workspace <ArrowRight className="h-4 w-4" />
-                </GradientButton>
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex w-full items-center justify-center rounded-2xl border border-token-soft bg-surface/70 px-5 py-3 text-sm font-semibold text-fg backdrop-blur hover:bg-surface sm:w-auto"
-              >
+              <PressableLink href="/signup" variant="primary" fullWidth className="sm:w-auto">
+                <UserPlus className="h-4 w-4" />
+                Create your workspace
+                <ArrowRight className="h-4 w-4" />
+              </PressableLink>
+              <PressableLink href="/login" variant="secondary" fullWidth className="sm:w-auto">
+                <LogIn className="h-4 w-4" />
                 Log in
-              </Link>
+              </PressableLink>
             </motion.div>
 
             {/* Floating insight cards */}
@@ -131,7 +129,6 @@ export function LandingHero() {
                 label="Risk Radar"
                 value="4 at-risk projects"
                 meta="2 deadlines this week"
-                float
               />
               <InsightCard
                 icon={Clock}
@@ -139,7 +136,6 @@ export function LandingHero() {
                 label="Waiting on Client"
                 value="3 blocked items"
                 meta="Stuck for 5+ days"
-                float
               />
               <InsightCard
                 icon={Handshake}
@@ -147,7 +143,6 @@ export function LandingHero() {
                 label="Promises Due"
                 value="5 this week"
                 meta="2 expire today"
-                float
               />
               <InsightCard
                 icon={Users}
@@ -155,7 +150,6 @@ export function LandingHero() {
                 label="Team Pulse"
                 value="2 overloaded"
                 meta="Rebalance recommended"
-                float
                 className="hidden sm:block"
               />
               <InsightCard
@@ -164,7 +158,6 @@ export function LandingHero() {
                 label="Missing Owners"
                 value="3 unassigned"
                 meta="Auto-suggest available"
-                float
                 className="hidden lg:block"
               />
               <InsightCard
@@ -173,22 +166,21 @@ export function LandingHero() {
                 label="Today's Focus"
                 value="6 actions queued"
                 meta="Built by AI"
-                float
                 className="hidden lg:block"
               />
             </div>
           </div>
 
-          {/* Right column — Live command center preview */}
+          {/* Right column — Live radar + Next Best Action stacked (no overlap) */}
           <div className="relative">
             <motion.div
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="relative"
+              className="relative flex flex-col gap-4"
             >
               {/* Radar centerpiece */}
-              <GlassCard className="relative overflow-hidden p-5 sm:p-6">
+              <GlassCard className="relative z-0 overflow-hidden p-5 sm:p-6">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <span className="inline-flex h-7 items-center gap-1.5 rounded-full border border-[rgb(var(--accent)/0.35)] bg-[rgb(var(--accent)/0.10)] px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[rgb(var(--accent))]">
@@ -239,14 +231,13 @@ export function LandingHero() {
                 </div>
               </GlassCard>
 
-              {/* NBA card overlapping */}
               <motion.div
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.18, ease: "easeOut" }}
-                className="relative -mt-3 sm:absolute sm:-bottom-10 sm:-left-6 sm:mt-0 sm:w-[78%]"
+                transition={{ duration: 0.5, delay: 0.12, ease: "easeOut" }}
+                className="relative z-10 w-full"
               >
-                <NextBestAction />
+                <NextBestAction solid />
               </motion.div>
             </motion.div>
           </div>
@@ -286,7 +277,7 @@ export function LandingHero() {
 
         <footer className="mt-16 border-t border-token-soft pt-8 text-sm text-fg-soft">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>© {new Date().getFullYear()} wuug · Built with Supabase + strict RLS</div>
+            <div>© {new Date().getFullYear()} wuug</div>
             <div className="flex items-center gap-4">
               <Link href="/login" className="hover:text-fg">
                 Log in

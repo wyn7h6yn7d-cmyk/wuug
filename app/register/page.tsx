@@ -8,6 +8,7 @@ import { BrandLogo } from "@/components/layout/brand-logo";
 import { OrbBackground } from "@/components/command-center/orb-background";
 import { GlassCard } from "@/components/command-center/glass-card";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { AuthSubmitButton } from "@/components/auth/auth-submit-button";
 import { createClient } from "@/lib/supabase/client";
 
 type InviteInfo = {
@@ -247,12 +248,10 @@ function RegisterPageInner() {
               />
             </label>
 
-            <button
+            <AuthSubmitButton
+              variant={inviteToken ? "join-workspace" : "create-account"}
               disabled={isSubmitting || (Boolean(inviteToken) && (isLoadingInvite || inviteError))}
-              className="mt-2 w-full rounded-2xl bg-gradient-to-r from-blue-500 via-violet-500 to-teal-400 px-4 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(97,107,255,0.28)] hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.99]"
-            >
-              {inviteToken ? "Join workspace" : "Create account"}
-            </button>
+            />
           </form>
 
           <p className="mt-4 text-sm text-fg-muted">

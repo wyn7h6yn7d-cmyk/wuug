@@ -13,7 +13,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { CommandBar } from "@/components/command-center/command-bar";
 import { GlassCard } from "@/components/command-center/glass-card";
-import { GradientButton } from "@/components/command-center/gradient-button";
+import { PressableLink } from "@/components/ui/pressable-link";
 import { InsightCard } from "@/components/command-center/insight-card";
 import { NextBestAction } from "@/components/command-center/next-best-action";
 import { PageHeader } from "@/components/ui/page-header";
@@ -177,11 +177,9 @@ async function ManagerServer() {
                 <h2 className="text-lg font-semibold text-fg">Recent activity</h2>
                 <p className="mt-1 text-sm text-fg-soft">Live log of changes across your workspace.</p>
               </div>
-              <Link href="/reports">
-                <GradientButton variant="secondary" size="sm">
-                  Reports <ArrowRight className="h-4 w-4" />
-                </GradientButton>
-              </Link>
+              <PressableLink href="/reports" variant="secondary" size="sm">
+                Reports <ArrowRight className="h-4 w-4" />
+              </PressableLink>
             </div>
             <ul className="mt-4 space-y-2">
               {recent.length === 0 ? (
@@ -234,26 +232,18 @@ async function ManagerServer() {
               ))}
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Link href="/team">
-                <GradientButton size="sm">
-                  <Users className="h-4 w-4" /> Team
-                </GradientButton>
-              </Link>
-              <Link href="/projects">
-                <GradientButton size="sm" variant="secondary">
-                  Projects
-                </GradientButton>
-              </Link>
-              <Link href="/promises">
-                <GradientButton size="sm" variant="secondary">
-                  Promises
-                </GradientButton>
-              </Link>
-              <Link href="/radar">
-                <GradientButton size="sm" variant="ghost">
-                  <Sparkles className="h-4 w-4" /> Radar
-                </GradientButton>
-              </Link>
+              <PressableLink href="/team" variant="primary" size="sm">
+                <Users className="h-4 w-4" /> Team
+              </PressableLink>
+              <PressableLink href="/projects" variant="secondary" size="sm">
+                Projects
+              </PressableLink>
+              <PressableLink href="/promises" variant="secondary" size="sm">
+                Promises
+              </PressableLink>
+              <PressableLink href="/radar" variant="ghost" size="sm">
+                <Sparkles className="h-4 w-4" /> Radar
+              </PressableLink>
             </div>
           </GlassCard>
         </div>

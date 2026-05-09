@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronRight, FolderPlus, Handshake, ListTodo, Plus, UserPlus, X } from "lucide-react";
+import { BTN_SPRING, BTN_TAP, btnHoverLift } from "@/lib/motion-presets";
 
 type FormField = {
   key: string;
@@ -117,13 +118,17 @@ export function CreateItemFlow() {
   return (
     <>
       <div className="relative">
-        <button
+        <motion.button
+          type="button"
           onClick={() => setMenuOpen((prev) => !prev)}
-          className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-500 via-violet-500 to-teal-400 px-4 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(97,107,255,0.28)] transition hover:opacity-95"
+          whileHover={btnHoverLift("primary")}
+          whileTap={BTN_TAP}
+          transition={BTN_SPRING}
+          className="inline-flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(99,102,241,0.35)] outline-none gradient-sheen focus-visible:ring-2 focus-visible:ring-[rgb(var(--ring))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] [&_svg]:transition-transform hover:[&_svg]:rotate-90"
         >
           <Plus className="h-4 w-4" />
           + Add new
-        </button>
+        </motion.button>
 
         <AnimatePresence>
           {menuOpen ? (
@@ -204,19 +209,25 @@ export function CreateItemFlow() {
               ))}
 
               <div className="flex items-center justify-end gap-2 pt-1">
-                <button
+                <motion.button
                   type="button"
                   onClick={closeModal}
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700"
+                  whileHover={btnHoverLift("secondary")}
+                  whileTap={BTN_TAP}
+                  transition={BTN_SPRING}
+                  className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--ring))]"
                 >
                   Cancel
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   type="submit"
-                  className="rounded-xl bg-gradient-to-r from-blue-500 via-violet-500 to-teal-400 px-4 py-2 text-sm font-semibold text-white"
+                  whileHover={btnHoverLift("primary")}
+                  whileTap={BTN_TAP}
+                  transition={BTN_SPRING}
+                  className="cursor-pointer rounded-xl px-4 py-2 text-sm font-semibold text-white outline-none gradient-sheen shadow-[0_10px_26px_rgba(99,102,241,0.3)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--ring))]"
                 >
                   Add
-                </button>
+                </motion.button>
               </div>
             </form>
             </motion.div>

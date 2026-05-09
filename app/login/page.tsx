@@ -5,6 +5,8 @@ import { GlassCard } from "@/components/command-center/glass-card";
 import { signIn } from "@/app/(auth)/actions";
 import { ResendConfirmation } from "@/components/auth/resend-confirmation";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { AuthSubmitButton } from "@/components/auth/auth-submit-button";
+import { safeDecodeURIComponent } from "@/lib/safe-decode";
 
 export default async function LoginPage({
   searchParams,
@@ -15,8 +17,7 @@ export default async function LoginPage({
   const created = params.created === "1";
   const confirm = params.confirm === "1";
   const error = params.error === "1";
-  const msgParam = params.msg;
-  const msg = typeof msgParam === "string" ? decodeURIComponent(msgParam) : null;
+  const msg = safeDecodeURIComponent(params.msg);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-app text-fg">
@@ -71,9 +72,7 @@ export default async function LoginPage({
               />
             </label>
 
-            <button className="mt-2 w-full rounded-2xl gradient-sheen px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(99,102,241,0.32)] hover:opacity-95 active:scale-[0.99]">
-              Sign in
-            </button>
+            <AuthSubmitButton variant="sign-in" />
           </form>
 
           <p className="mt-4 text-sm text-fg-muted">

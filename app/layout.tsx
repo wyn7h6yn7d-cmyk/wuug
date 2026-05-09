@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   description:
     "wuug shows what needs the next step before anything is forgotten. A living radar for clients, projects, tasks, and promises.",
   icons: {
-    icon: [{ url: "/icon.png", sizes: "512x512", type: "image/png" }],
-    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/icon.svg", type: "image/svg+xml" }],
   },
 };
 

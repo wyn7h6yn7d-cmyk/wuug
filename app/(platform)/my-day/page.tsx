@@ -1,10 +1,9 @@
-import Link from "next/link";
 import { cookies } from "next/headers";
 import { ArrowRight, Clock, Handshake, ListTodo, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { CommandBar } from "@/components/command-center/command-bar";
 import { GlassCard } from "@/components/command-center/glass-card";
-import { GradientButton } from "@/components/command-center/gradient-button";
+import { PressableLink } from "@/components/ui/pressable-link";
 import { InsightCard } from "@/components/command-center/insight-card";
 import { NextBestAction } from "@/components/command-center/next-best-action";
 import { PageHeader } from "@/components/ui/page-header";
@@ -120,11 +119,9 @@ async function MyDayServer() {
                 ))
               )}
             </ul>
-            <Link href="/tasks">
-              <GradientButton variant="secondary" size="sm" className="mt-3">
-                Open all tasks <ArrowRight className="h-4 w-4" />
-              </GradientButton>
-            </Link>
+            <PressableLink href="/tasks" variant="secondary" size="sm" className="mt-3">
+              Open all tasks <ArrowRight className="h-4 w-4" />
+            </PressableLink>
           </GlassCard>
         </div>
 
@@ -191,16 +188,12 @@ async function MyDayServer() {
               )}
             </ul>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Link href="/clients">
-                <GradientButton variant="secondary" size="sm">
-                  My clients
-                </GradientButton>
-              </Link>
-              <Link href="/projects">
-                <GradientButton variant="secondary" size="sm">
-                  My projects
-                </GradientButton>
-              </Link>
+              <PressableLink href="/clients" variant="secondary" size="sm">
+                My clients
+              </PressableLink>
+              <PressableLink href="/projects" variant="secondary" size="sm">
+                My projects
+              </PressableLink>
             </div>
           </GlassCard>
         </div>
