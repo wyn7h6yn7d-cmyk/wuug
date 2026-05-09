@@ -66,6 +66,7 @@ function ProjectModal({
   initialValues,
   busy,
   error,
+  ownerLocked,
   onClose,
   onSubmit,
 }: {
@@ -76,6 +77,8 @@ function ProjectModal({
   initialValues: ProjectFormValues;
   busy: boolean;
   error: string | null;
+  /** When true, owner is always the signed-in user (team members). */
+  ownerLocked?: boolean;
   onClose: () => void;
   onSubmit: (values: ProjectFormValues) => void | Promise<void>;
 }) {
@@ -155,17 +158,24 @@ function ProjectModal({
             </label>
           </div>
 
-          <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-slate-700">Owner</span>
-            <select value={values.owner_id} onChange={set("owner_id")} className={inputClass}>
-              <option value="">Unassigned</option>
-              {lookups.owners.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          {ownerLocked ? (
+            <div className="block">
+              <span className="mb-1.5 block text-sm font-medium text-slate-700">Owner</span>
+              <div className={`${inputClass} cursor-not-allowed bg-slate-100 text-slate-600`}>You</div>
+            </div>
+          ) : (
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium text-slate-700">Owner</span>
+              <select value={values.owner_id} onChange={set("owner_id")} className={inputClass}>
+                <option value="">Unassigned</option>
+                {lookups.owners.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
 
           <div className="grid gap-3 md:grid-cols-2">
             <label className="block">
@@ -246,6 +256,8 @@ export function ProjectsPageClient({
   const [deleteError, setDeleteError] = React.useState<string | null>(null);
 
   const canManage = role !== "member";
+  const canAddProject = Boolean(organizationId && profileId);
+  const canEditSelected = Boolean(selected && (canManage || selected.owner_id === profileId));
 
   const openCreate = () => {
     setModalMode("create");
@@ -309,7 +321,7 @@ export function ProjectsPageClient({
       const progressNum = values.progress.trim() === "" ? null : Math.max(0, Math.min(100, Number(values.progress)));
       const nextStepDueAt = inputDateToTimestamptz(values.next_step_due_date);
       const clientId = values.client_id || null;
-      const ownerId = values.owner_id || null;
+      const ownerId = role === "member" ? profileId : values.owner_id || null;
 
       if (modalMode === "create") {
         const { data, error } = await supabase
@@ -404,11 +416,11 @@ export function ProjectsPageClient({
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <PageHeader title="Projects" subtitle="Create, track, and update status in one place." />
           <div className="flex items-center gap-2">
-            {canManage ? (
+            {canAddProject ? (
               <button
                 type="button"
                 onClick={openCreate}
-                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-sm hover:bg-slate-50"
+                className="inline-flex items-center gap-2 rounded-2xl border border-token-soft bg-surface/80 px-4 py-2.5 text-sm font-semibold text-fg shadow-sm hover:bg-surface"
               >
                 <Plus className="h-4 w-4" />
                 New project
@@ -424,8 +436,18 @@ export function ProjectsPageClient({
             <div className="text-sm font-semibold text-slate-900">All projects</div>
             <div className="mt-3 space-y-2">
               {projects.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-4 text-sm text-slate-600">
-                  No projects yet.
+                <div className="rounded-2xl border border-dashed border-token-soft bg-surface/50 px-4 py-4 text-sm text-fg-soft">
+                  <p>No projects yet.</p>
+                  {canAddProject ? (
+                    <button
+                      type="button"
+                      onClick={openCreate}
+                      className="mt-3 inline-flex items-center gap-2 rounded-xl border border-token-soft bg-surface/80 px-3 py-2 text-sm font-semibold text-fg hover:bg-surface"
+                    >
+                      <Plus className="h-4 w-4" />
+                      New project
+                    </button>
+                  ) : null}
                 </div>
               ) : (
                 projects.map((p) => {
@@ -466,27 +488,31 @@ export function ProjectsPageClient({
                       Status: {(selected.status ?? "not_started").replaceAll("_", " ")} • Progress: {selected.progress ?? 0}%
                     </div>
                   </div>
-                  {canManage ? (
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={openEdit}
-                        className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50"
-                      >
-                        <Pencil className="h-4 w-4" />
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setDeleteError(null);
-                          setDeleteOpen(true);
-                        }}
-                        className="inline-flex items-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-100"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        Delete
-                      </button>
+                  {canEditSelected || canManage ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                      {canEditSelected ? (
+                        <button
+                          type="button"
+                          onClick={openEdit}
+                          className="inline-flex items-center gap-2 rounded-2xl border border-token-soft bg-surface/80 px-3 py-2 text-sm font-semibold text-fg hover:bg-surface"
+                        >
+                          <Pencil className="h-4 w-4" />
+                          Edit
+                        </button>
+                      ) : null}
+                      {canManage ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDeleteError(null);
+                            setDeleteOpen(true);
+                          }}
+                          className="inline-flex items-center gap-2 rounded-2xl border border-rose-500/35 bg-rose-500/10 px-3 py-2 text-sm font-semibold text-rose-700 dark:text-rose-300"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Delete
+                        </button>
+                      ) : null}
                     </div>
                   ) : null}
                 </div>
@@ -518,6 +544,7 @@ export function ProjectsPageClient({
         initialValues={baseInitial}
         busy={modalBusy}
         error={modalError}
+        ownerLocked={!canManage}
         onClose={() => setModalOpen(false)}
         onSubmit={submit}
       />
