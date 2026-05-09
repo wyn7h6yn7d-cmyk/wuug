@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-import { canAccessAdminPanel } from "@/lib/master-admin";
+import { canAccessAdminPanel, isMasterAdminEmail } from "@/lib/master-admin";
 
 async function requireAdmin() {
   const supabase = createClient(await cookies());
@@ -130,4 +130,48 @@ export async function adminDeleteInvitationAction(formData: FormData) {
 
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+}
+
+/**
+ * Empty DB: auth user exists but signup/onboarding never created organizations + profiles.
+ * Creates the first workspace via create_workspace; master email gets owner + platform_admin on profile.
+ */
+export async function bootstrapWorkspaceIfMissingAction(formData: FormData) {
+  const supabase = createClient(await cookies());
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.email) throw new Error("Not signed in.");
+
+  const { data: existing } = await supabase.from("profiles").select("id").eq("id", user.id).maybeSingle();
+  if (existing) throw new Error("You already have a profile.");
+
+  if (!canAccessAdminPanel(false, user.email)) {
+    throw new Error("Only platform administrators can seed an empty database from here.");
+  }
+
+  const orgName = String(formData.get("organization_name") ?? "").trim() || "My workspace";
+  const fullName =
+    String(formData.get("full_name") ?? "").trim() ||
+    (typeof user.user_metadata?.full_name === "string" ? user.user_metadata.full_name : "") ||
+    user.email.split("@")[0] ||
+    "Owner";
+
+  const { error: rpcError } = await supabase.rpc("create_workspace", {
+    p_organization_name: orgName,
+    p_full_name: fullName,
+  });
+  if (rpcError) throw new Error(rpcError.message);
+
+  if (isMasterAdminEmail(user.email)) {
+    const { error: upErr } = await supabase
+      .from("profiles")
+      .update({ role: "owner", platform_admin: true })
+      .eq("id", user.id);
+    if (upErr) throw new Error(upErr.message);
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/manager");
+  revalidatePath("/my-day");
 }

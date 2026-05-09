@@ -10,6 +10,7 @@ import {
   adminSetPlatformAdminAction,
   adminUpdateOrgSubscriptionAction,
   adminUpdateUserRoleAction,
+  bootstrapWorkspaceIfMissingAction,
 } from "@/app/admin/actions";
 import { isMasterAdminEmail } from "@/lib/master-admin";
 
@@ -149,6 +150,55 @@ export function AdminPanel({
           <pre className="mt-3 max-h-48 overflow-auto rounded-xl border border-token-soft bg-surface/80 p-3 text-[11px] leading-relaxed text-fg-soft">
             {JSON.stringify(sessionDiagnostic, null, 2)}
           </pre>
+        </GlassCard>
+      ) : null}
+
+      {sessionDiagnostic &&
+      typeof sessionDiagnostic.profiles_row_count === "number" &&
+      sessionDiagnostic.profiles_row_count === 0 ? (
+        <GlassCard className="border border-emerald-500/35 bg-emerald-500/10 p-4 md:p-6">
+          <h2 className="text-lg font-semibold text-fg">Create your first workspace</h2>
+          <p className="mt-1 text-sm text-fg-soft">
+            Permissions are fine (<span className="font-medium text-fg">is_platform_admin</span> is true), but this
+            project has no <code className="rounded bg-surface/80 px-1">organizations</code> or{" "}
+            <code className="rounded bg-surface/80 px-1">profiles</code> rows yet — only{" "}
+            <code className="rounded bg-surface/80 px-1">auth.users</code>. That is why every admin tab is empty. Run the
+            same <code className="rounded bg-surface/80 px-1">create_workspace</code> step as signup, or submit below.
+          </p>
+          <form
+            className="mt-4 flex max-w-lg flex-col gap-3"
+            action={async (fd) => {
+              try {
+                await bootstrapWorkspaceIfMissingAction(fd);
+                toast("Workspace created. Refresh if tables do not update.");
+              } catch (e) {
+                toast(e instanceof Error ? e.message : "Something went wrong.");
+              }
+            }}
+          >
+            <label className="text-xs font-medium text-fg-muted">
+              Company / workspace name
+              <input
+                name="organization_name"
+                placeholder="e.g. KG Wuug OÜ"
+                className="mt-1 w-full rounded-xl border border-token-soft bg-surface/80 px-3 py-2 text-sm text-fg"
+              />
+            </label>
+            <label className="text-xs font-medium text-fg-muted">
+              Your name
+              <input
+                name="full_name"
+                placeholder="Full name"
+                className="mt-1 w-full rounded-xl border border-token-soft bg-surface/80 px-3 py-2 text-sm text-fg"
+              />
+            </label>
+            <button
+              type="submit"
+              className="w-fit rounded-2xl bg-[rgb(var(--accent))] px-4 py-2.5 text-sm font-semibold text-white"
+            >
+              Create workspace and profile
+            </button>
+          </form>
         </GlassCard>
       ) : null}
 
