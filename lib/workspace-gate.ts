@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isMasterAdminEmail } from "@/lib/master-admin";
 
 /**
  * Blocks normal app usage when the user is banned, the workspace is paused,
@@ -28,7 +29,7 @@ export async function assertWorkspaceAccess() {
     redirect(`/account-suspended${q}`);
   }
 
-  if (profile.platform_admin) return;
+  if (profile.platform_admin || isMasterAdminEmail(user.email)) return;
 
   if (!profile.organization_id) return;
 

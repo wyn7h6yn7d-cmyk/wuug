@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { canAccessAdminPanel } from "@/lib/master-admin";
 
 async function requireAdmin() {
   const supabase = createClient(await cookies());
@@ -17,7 +18,9 @@ async function requireAdmin() {
     .eq("id", user.id)
     .maybeSingle();
 
-  if (!profile?.platform_admin) throw new Error("Admin only.");
+  if (!canAccessAdminPanel(Boolean(profile?.platform_admin), user.email)) {
+    throw new Error("Admin only.");
+  }
 
   return { supabase, userId: user.id };
 }

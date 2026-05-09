@@ -1,6 +1,12 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { AdminPanel, type AdminInviteRow, type AdminOrgRow, type AdminProfileRow } from "@/components/admin/admin-panel";
+import {
+  AdminPanel,
+  type AdminInviteRow,
+  type AdminOrgRow,
+  type AdminProfileRow,
+} from "@/components/admin/admin-panel";
+import { canAccessAdminPanel } from "@/lib/master-admin";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AdminPage() {
@@ -16,7 +22,9 @@ export default async function AdminPage() {
     .eq("id", user.id)
     .maybeSingle();
 
-  if (!profile?.platform_admin) redirect("/");
+  if (!canAccessAdminPanel(Boolean(profile?.platform_admin), user.email)) {
+    redirect("/");
+  }
 
   const [profilesRes, orgsRes, invitesRes] = await Promise.all([
     supabase.rpc("admin_list_profiles"),
