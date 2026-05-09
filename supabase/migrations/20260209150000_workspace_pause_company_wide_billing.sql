@@ -28,7 +28,9 @@ begin
 end;
 $$;
 
--- Return pause flag in admin list
+-- Return pause flag in admin list (DROP required: PG cannot change TABLE return shape with CREATE OR REPLACE)
+drop function if exists public.admin_list_organizations();
+
 create or replace function public.admin_list_organizations()
 returns table (
   id uuid,
@@ -57,6 +59,8 @@ as $$
   from public.organizations o
   where public.is_platform_admin();
 $$;
+
+grant execute on function public.admin_list_organizations() to authenticated;
 
 -- Replace RPC with access_paused parameter (drops old 5-arg overload name conflict in some PG versions)
 drop function if exists public.admin_update_organization_subscription(uuid, text, timestamptz, timestamptz, boolean);

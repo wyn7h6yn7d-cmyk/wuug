@@ -11,6 +11,7 @@ import {
   adminUpdateOrgSubscriptionAction,
   adminUpdateUserRoleAction,
 } from "@/app/admin/actions";
+import { isMasterAdminEmail } from "@/lib/master-admin";
 
 export type AdminProfileRow = {
   id: string;
@@ -85,7 +86,7 @@ export function AdminPanel({
     <div className="space-y-6 pb-12">
       <PageHeader
         title="Platform admin"
-        subtitle="Users, billing, subscriptions, and access. Manager and owner roles require a paid invoice unless you force the change."
+        subtitle="Users, billing, subscriptions, and access. The master account (kennethalto95@gmail.com) is always owner and platform admin and cannot be demoted, stripped of admin, or banned. Other admins cannot change that."
       />
 
       {loadError ? (
@@ -139,108 +140,126 @@ export function AdminPanel({
               </tr>
             </thead>
             <tbody>
-              {profiles.map((p) => (
-                <tr key={p.id} className="align-top">
-                  <td className="border-b border-token-soft/60 py-3 pr-3">
-                    <div className="font-semibold text-fg">{p.full_name}</div>
-                    <div className="text-xs text-fg-soft">{p.email}</div>
-                    <div className="mt-1 text-xs text-fg-muted">
-                      Role: <span className="font-medium text-fg">{p.role}</span>
-                      {p.platform_admin ? (
-                        <span className="ml-2 rounded-md bg-amber-500/20 px-1.5 py-0.5 text-amber-800 dark:text-amber-200">
-                          Admin
-                        </span>
-                      ) : null}
-                      {p.banned_at ? (
-                        <span className="ml-2 text-rose-600 dark:text-rose-400">Banned</span>
-                      ) : null}
-                    </div>
-                  </td>
-                  <td className="border-b border-token-soft/60 py-3 pr-3 text-fg-soft">
-                    {p.organization_name ?? "—"}
-                  </td>
-                  <td className="border-b border-token-soft/60 py-3 pr-3 text-xs text-fg-soft">
-                    <div>Status: {p.subscription_status ?? "—"}</div>
-                    <div>Ends: {p.subscription_ends_at ? new Date(p.subscription_ends_at).toLocaleString() : "—"}</div>
-                    <div>Paid: {p.invoice_paid_at ? new Date(p.invoice_paid_at).toLocaleString() : "—"}</div>
-                  </td>
-                  <td className="border-b border-token-soft/60 py-3">
-                    <form
-                      className="mb-3 flex flex-wrap items-end gap-2"
-                      action={(fd) => runAction(adminUpdateUserRoleAction, fd)}
-                    >
-                      <input type="hidden" name="user_id" value={p.id} />
-                      <label className="text-xs font-medium text-fg-muted">
-                        Role
-                        <select
-                          name="role"
-                          defaultValue={p.role}
-                          className="mt-1 block rounded-xl border border-token-soft bg-surface/80 px-2 py-1.5 text-sm text-fg"
-                        >
-                          <option value="member">member</option>
-                          <option value="manager">manager</option>
-                          <option value="owner">owner</option>
-                        </select>
-                      </label>
-                      <label className="flex items-center gap-1.5 text-xs text-fg-soft">
-                        <input type="checkbox" name="force_billing" className="rounded border-token-soft" />
-                        Force (ignore invoice)
-                      </label>
-                      <button
-                        type="submit"
-                        className="rounded-xl bg-[rgb(var(--accent))] px-3 py-1.5 text-xs font-semibold text-white"
-                      >
-                        Save role
-                      </button>
-                    </form>
-                    <form
-                      className="mb-3 flex flex-wrap items-end gap-2"
-                      action={(fd) => runAction(adminSetPlatformAdminAction, fd)}
-                    >
-                      <input type="hidden" name="user_id" value={p.id} />
-                      <label className="flex items-center gap-1.5 text-xs text-fg-soft">
-                        <input
-                          type="checkbox"
-                          name="is_admin"
-                          defaultChecked={p.platform_admin}
-                          className="rounded border-token-soft"
-                        />
-                        Platform admin
-                      </label>
-                      <button
-                        type="submit"
-                        className="rounded-xl border border-token-soft bg-surface/80 px-3 py-1.5 text-xs font-semibold text-fg"
-                      >
-                        Save admin flag
-                      </button>
-                    </form>
-                    <form className="flex flex-col gap-2" action={(fd) => runAction(adminSetBanAction, fd)}>
-                      <input type="hidden" name="user_id" value={p.id} />
-                      <label className="flex items-center gap-1.5 text-xs text-fg-soft">
-                        <input
-                          type="checkbox"
-                          name="banned"
-                          defaultChecked={Boolean(p.banned_at)}
-                          className="rounded border-token-soft"
-                        />
-                        Banned
-                      </label>
-                      <input
-                        name="reason"
-                        placeholder="Ban note (optional)"
-                        defaultValue={p.ban_reason ?? ""}
-                        className="w-full max-w-xs rounded-xl border border-token-soft bg-surface/80 px-2 py-1.5 text-xs text-fg"
-                      />
-                      <button
-                        type="submit"
-                        className="w-fit rounded-xl border border-rose-500/40 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-700 dark:text-rose-300"
-                      >
-                        Update ban
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
+              {profiles.map((p) => {
+                const master = isMasterAdminEmail(p.email);
+                return (
+                  <tr key={p.id} className="align-top">
+                    <td className="border-b border-token-soft/60 py-3 pr-3">
+                      <div className="font-semibold text-fg">{p.full_name}</div>
+                      <div className="text-xs text-fg-soft">{p.email}</div>
+                      <div className="mt-1 text-xs text-fg-muted">
+                        Role: <span className="font-medium text-fg">{p.role}</span>
+                        {master ? (
+                          <span className="ml-2 rounded-md bg-violet-500/25 px-1.5 py-0.5 font-medium text-violet-800 dark:text-violet-200">
+                            Master admin
+                          </span>
+                        ) : null}
+                        {p.platform_admin ? (
+                          <span className="ml-2 rounded-md bg-amber-500/20 px-1.5 py-0.5 text-amber-800 dark:text-amber-200">
+                            Admin
+                          </span>
+                        ) : null}
+                        {p.banned_at ? (
+                          <span className="ml-2 text-rose-600 dark:text-rose-400">Banned</span>
+                        ) : null}
+                      </div>
+                    </td>
+                    <td className="border-b border-token-soft/60 py-3 pr-3 text-fg-soft">
+                      {p.organization_name ?? "—"}
+                    </td>
+                    <td className="border-b border-token-soft/60 py-3 pr-3 text-xs text-fg-soft">
+                      <div>Status: {p.subscription_status ?? "—"}</div>
+                      <div>Ends: {p.subscription_ends_at ? new Date(p.subscription_ends_at).toLocaleString() : "—"}</div>
+                      <div>Paid: {p.invoice_paid_at ? new Date(p.invoice_paid_at).toLocaleString() : "—"}</div>
+                    </td>
+                    <td className="border-b border-token-soft/60 py-3">
+                      {master ? (
+                        <p className="max-w-xs text-xs leading-relaxed text-fg-soft">
+                          This account is locked as <span className="font-medium text-fg">owner</span> and{" "}
+                          <span className="font-medium text-fg">platform admin</span>. Role, admin flag, and ban controls
+                          are disabled here and enforced in the database.
+                        </p>
+                      ) : (
+                        <>
+                          <form
+                            className="mb-3 flex flex-wrap items-end gap-2"
+                            action={(fd) => runAction(adminUpdateUserRoleAction, fd)}
+                          >
+                            <input type="hidden" name="user_id" value={p.id} />
+                            <label className="text-xs font-medium text-fg-muted">
+                              Role
+                              <select
+                                name="role"
+                                defaultValue={p.role}
+                                className="mt-1 block rounded-xl border border-token-soft bg-surface/80 px-2 py-1.5 text-sm text-fg"
+                              >
+                                <option value="member">member</option>
+                                <option value="manager">manager</option>
+                                <option value="owner">owner</option>
+                              </select>
+                            </label>
+                            <label className="flex items-center gap-1.5 text-xs text-fg-soft">
+                              <input type="checkbox" name="force_billing" className="rounded border-token-soft" />
+                              Force (ignore invoice)
+                            </label>
+                            <button
+                              type="submit"
+                              className="rounded-xl bg-[rgb(var(--accent))] px-3 py-1.5 text-xs font-semibold text-white"
+                            >
+                              Save role
+                            </button>
+                          </form>
+                          <form
+                            className="mb-3 flex flex-wrap items-end gap-2"
+                            action={(fd) => runAction(adminSetPlatformAdminAction, fd)}
+                          >
+                            <input type="hidden" name="user_id" value={p.id} />
+                            <label className="flex items-center gap-1.5 text-xs text-fg-soft">
+                              <input
+                                type="checkbox"
+                                name="is_admin"
+                                defaultChecked={p.platform_admin}
+                                className="rounded border-token-soft"
+                              />
+                              Platform admin
+                            </label>
+                            <button
+                              type="submit"
+                              className="rounded-xl border border-token-soft bg-surface/80 px-3 py-1.5 text-xs font-semibold text-fg"
+                            >
+                              Save admin flag
+                            </button>
+                          </form>
+                          <form className="flex flex-col gap-2" action={(fd) => runAction(adminSetBanAction, fd)}>
+                            <input type="hidden" name="user_id" value={p.id} />
+                            <label className="flex items-center gap-1.5 text-xs text-fg-soft">
+                              <input
+                                type="checkbox"
+                                name="banned"
+                                defaultChecked={Boolean(p.banned_at)}
+                                className="rounded border-token-soft"
+                              />
+                              Banned
+                            </label>
+                            <input
+                              name="reason"
+                              placeholder="Ban note (optional)"
+                              defaultValue={p.ban_reason ?? ""}
+                              className="w-full max-w-xs rounded-xl border border-token-soft bg-surface/80 px-2 py-1.5 text-xs text-fg"
+                            />
+                            <button
+                              type="submit"
+                              className="w-fit rounded-xl border border-rose-500/40 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-700 dark:text-rose-300"
+                            >
+                              Update ban
+                            </button>
+                          </form>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </GlassCard>
