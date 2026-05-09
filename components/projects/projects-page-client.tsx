@@ -7,7 +7,7 @@ import { FadeIn } from "@/components/ui/fade-in";
 import { PageHeader } from "@/components/ui/page-header";
 import { SurfaceCard } from "@/components/ui/surface-card";
 import { ConfirmModal } from "@/components/clients/client-modals";
-import { useToast } from "@/components/ui/toast";
+import { toast } from "@/components/ui/toast";
 
 type AppRole = "owner" | "manager" | "member";
 
@@ -230,7 +230,6 @@ export function ProjectsPageClient({
   lookups: ProjectLookup;
 }) {
   const supabase = React.useMemo(() => createClient(), []);
-  const toast = useToast();
 
   const [projects, setProjects] = React.useState<ProjectRow[]>(initialProjects);
   const [selectedId, setSelectedId] = React.useState<string>(initialProjects[0]?.id ?? "");
@@ -336,7 +335,7 @@ export function ProjectsPageClient({
         setProjects((prev) => [row, ...prev]);
         setSelectedId(row.id);
         await writeActivity({ title: `Created project: ${row.name}`, entity_id: row.id, project_id: row.id, client_id: row.client_id, status: row.status });
-        toast.success("Project created");
+        toast("Project created");
       } else if (selected) {
         const { data, error } = await supabase
           .from("projects")
@@ -359,7 +358,7 @@ export function ProjectsPageClient({
         const row = data as unknown as ProjectRow;
         setProjects((prev) => prev.map((p) => (p.id === row.id ? row : p)));
         await writeActivity({ title: `Updated project: ${row.name}`, entity_id: row.id, project_id: row.id, client_id: row.client_id, status: row.status });
-        toast.success("Project updated");
+        toast("Project updated");
       }
 
       setModalOpen(false);
@@ -389,7 +388,7 @@ export function ProjectsPageClient({
       });
 
       await writeActivity({ title: `Deleted project: ${deletedName}`, entity_id: deletedId, project_id: deletedId, client_id: selected.client_id, status: null });
-      toast.success("Project deleted");
+      toast("Project deleted");
       setDeleteOpen(false);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Failed to delete project";

@@ -39,10 +39,10 @@ function isAuthRoute(pathname: string) {
   return pathname === "/login" || pathname === "/signup" || pathname === "/register";
 }
 
-function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+function withTimeout<T>(fn: () => Promise<T>, ms: number, label: string): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const t = window.setTimeout(() => reject(new Error(`${label} timed out`)), ms);
-    promise.then(
+    fn().then(
       (value) => {
         window.clearTimeout(t);
         resolve(value);
@@ -73,19 +73,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Always read the session user from Supabase — avoids stale React `user` during auth transitions.
       const {
         data: { user: currentUser },
-      } = await withTimeout(supabase.auth.getUser(), 6000, "auth.getUser");
+      } = await withTimeout(() => supabase.auth.getUser(), 6000, "auth.getUser");
       if (!currentUser) {
         setProfile(null);
         setOrganization(null);
         return;
       }
 
-      const { data: profileRow, error: profileError } = await withTimeout(
-        supabase
-          .from("profiles")
-          .select("id, organization_id, full_name, email, avatar_url, role")
-          .eq("id", currentUser.id)
-          .maybeSingle(),
+      const { data: profileRow, error: profileError } = await withTimeout<{ data: unknown; error: unknown }>(
+        () =>
+          (supabase
+            .from("profiles")
+            .select("id, organization_id, full_name, email, avatar_url, role")
+            .eq("id", currentUser.id)
+            .maybeSingle() as unknown) as Promise<{ data: unknown; error: unknown }>,
         6000,
         "profiles.select",
       );
@@ -104,12 +105,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const { data: orgRow } = await withTimeout(
-        supabase
-          .from("organizations")
-          .select("id, name, logo_url, industry")
-          .eq("id", nextProfile.organization_id)
-          .maybeSingle(),
+      const { data: orgRow } = await withTimeout<{ data: unknown; error: unknown }>(
+        () =>
+          (supabase
+            .from("organizations")
+            .select("id, name, logo_url, industry")
+            .eq("id", nextProfile.organization_id)
+            .maybeSingle() as unknown) as Promise<{ data: unknown; error: unknown }>,
         6000,
         "organizations.select",
       );
@@ -130,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const {
           data: { session },
-        } = await withTimeout(supabase.auth.getSession(), 6000, "auth.getSession");
+        } = await withTimeout(() => supabase.auth.getSession(), 6000, "auth.getSession");
 
         if (cancelled) return;
         setUser(session?.user ?? null);
