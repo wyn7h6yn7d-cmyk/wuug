@@ -32,19 +32,26 @@ export async function signIn(formData: FormData) {
     .eq("id", user.id)
     .maybeSingle();
 
-  if (inviteToken && !profileRow?.organization_id) {
-    const meta = user.user_metadata as { full_name?: string } | undefined;
-    const fullName =
-      typeof meta?.full_name === "string" && meta.full_name.trim()
-        ? meta.full_name.trim()
-        : email.split("@")[0] ?? "Member";
-    const { error: acceptError } = await supabase.rpc("accept_invitation", {
-      p_token: inviteToken,
-      p_full_name: fullName,
-    });
-    if (acceptError) {
-      const inviteQ = inviteToken ? `&invite=${encodeURIComponent(inviteToken)}` : "";
-      redirect(`/login?error=1&msg=${encodeErr(acceptError.message)}${inviteQ}`);
+  const meta = user.user_metadata as { full_name?: string } | undefined;
+  const fullName =
+    typeof meta?.full_name === "string" && meta.full_name.trim()
+      ? meta.full_name.trim()
+      : email.split("@")[0] ?? "Member";
+
+  if (!profileRow?.organization_id) {
+    if (inviteToken) {
+      const { error: acceptError } = await supabase.rpc("accept_invitation", {
+        p_token: inviteToken,
+        p_full_name: fullName,
+      });
+      if (acceptError) {
+        const inviteQ = `&invite=${encodeURIComponent(inviteToken)}`;
+        redirect(`/login?error=1&msg=${encodeErr(acceptError.message)}${inviteQ}`);
+      }
+    } else {
+      await supabase.rpc("accept_pending_invitation_for_user", {
+        p_full_name: fullName,
+      });
     }
   }
 

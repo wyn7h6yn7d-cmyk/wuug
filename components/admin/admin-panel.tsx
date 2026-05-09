@@ -2,7 +2,9 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { Building2, CreditCard, ShieldCheck, UserRound } from "lucide-react";
 import { GlassCard } from "@/components/command-center/glass-card";
+import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/page-header";
 import { toast } from "@/components/ui/toast";
 import {
@@ -60,6 +62,29 @@ function toLocalInput(iso: string | null | undefined) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
   return d.toISOString().slice(0, 16);
+}
+
+function initialsFromName(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0] ?? ""}${parts[parts.length - 1][0] ?? ""}`.toUpperCase();
+}
+
+function subscriptionStatusClass(status: string | null | undefined): string {
+  switch (status) {
+    case "active":
+      return "border-emerald-500/35 bg-emerald-500/[0.12] text-emerald-800 dark:text-emerald-200";
+    case "trial":
+      return "border-amber-500/35 bg-amber-500/[0.12] text-amber-900 dark:text-amber-200";
+    case "past_due":
+      return "border-orange-500/35 bg-orange-500/[0.12] text-orange-900 dark:text-orange-200";
+    case "expired":
+    case "suspended":
+      return "border-rose-500/35 bg-rose-500/[0.12] text-rose-800 dark:text-rose-200";
+    default:
+      return "border-token-soft bg-surface/60 text-fg-muted";
+  }
 }
 
 export function AdminPanel({
@@ -229,14 +254,21 @@ export function AdminPanel({
       </div>
 
       {tab === "users" ? (
-        <GlassCard className="overflow-x-auto p-4 md:p-6">
-          <h2 className="text-lg font-semibold text-fg">Registered users</h2>
-          <p className="mt-1 text-sm text-fg-soft">
-            Promote to manager only when the workspace has an invoice on file and an active subscription window (or use
-            force).
-          </p>
+        <GlassCard className="p-5 md:p-8" solid>
+          <div className="relative">
+            <div className="pointer-events-none absolute -right-8 -top-16 h-40 w-40 rounded-full bg-[rgb(var(--accent)/0.12)] blur-3xl" />
+            <div className="relative">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-fg-muted">Directory</p>
+              <h2 className="mt-1 text-xl font-semibold tracking-tight text-fg md:text-2xl">Registered users</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-fg-soft">
+                Promote to manager only when the workspace has an invoice on file and an active subscription window—or use{" "}
+                <span className="font-medium text-fg">force</span> to override.
+              </p>
+            </div>
+          </div>
+
           {!loadError && profiles.length === 0 ? (
-            <div className="mt-4 rounded-2xl border border-amber-500/35 bg-amber-500/10 p-4">
+            <div className="mt-6 rounded-2xl border border-amber-500/35 bg-amber-500/10 p-4">
               <p className="text-sm font-semibold text-fg">No rows returned</p>
               <p className="mt-1 text-sm text-fg-soft">
                 {showWorkspaceBootstrap ? (
@@ -257,70 +289,125 @@ export function AdminPanel({
               </p>
             </div>
           ) : null}
-          <table className="mt-4 w-full min-w-[920px] border-separate border-spacing-0 text-left text-sm">
-            <thead>
-              <tr className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
-                <th className="border-b border-token-soft pb-2 pr-3">User</th>
-                <th className="border-b border-token-soft pb-2 pr-3">Workspace</th>
-                <th className="border-b border-token-soft pb-2 pr-3">Billing</th>
-                <th className="border-b border-token-soft pb-2 pr-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {profilesOrdered.map((p) => {
-                const master = isMasterAdminEmail(p.email);
-                const isYou = p.id === signedInUserId;
-                return (
-                  <tr
-                    key={p.id}
-                    className={`align-top ${isYou ? "bg-[rgb(var(--accent)/0.06)] ring-1 ring-[rgb(var(--accent)/0.2)] ring-inset" : ""}`}
-                  >
-                    <td className="border-b border-token-soft/60 py-3 pr-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <div className="font-semibold text-fg">{p.full_name}</div>
-                        {isYou ? (
-                          <span className="rounded-md bg-[rgb(var(--accent)/0.2)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-fg">
-                            You
-                          </span>
-                        ) : null}
+
+          <div className="mt-8 space-y-5">
+            {profilesOrdered.map((p) => {
+              const master = isMasterAdminEmail(p.email);
+              const isYou = p.id === signedInUserId;
+              return (
+                <div
+                  key={p.id}
+                  className={cn(
+                    "relative overflow-hidden rounded-[22px] border bg-surface/50 p-5 shadow-[0_8px_30px_rgba(15,23,42,0.06)] backdrop-blur-sm transition dark:bg-[rgb(var(--surface-strong)/0.45)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.35)]",
+                    "border-token-soft",
+                    isYou &&
+                      "border-[rgb(var(--accent)/0.4)] shadow-[0_12px_40px_rgb(var(--accent)/0.12)] ring-1 ring-[rgb(var(--accent)/0.2)]",
+                  )}
+                >
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgb(var(--accent)/0.35)] to-transparent opacity-80" />
+
+                  <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+                    <div className="flex min-w-0 flex-1 gap-4">
+                      <div
+                        className={cn(
+                          "flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-sm font-bold tracking-tight text-fg shadow-inner",
+                          "bg-gradient-to-br from-[rgb(var(--accent)/0.35)] via-[rgb(var(--accent-2)/0.22)] to-[rgb(var(--accent-3)/0.2)]",
+                          "ring-1 ring-white/20 dark:ring-white/10",
+                        )}
+                        aria-hidden
+                      >
+                        {initialsFromName(p.full_name)}
                       </div>
-                      <div className="text-xs text-fg-soft">{p.email}</div>
-                      <div className="mt-1 text-xs text-fg-muted">
-                        Role: <span className="font-medium text-fg">{p.role}</span>
-                        {master ? (
-                          <span className="ml-2 rounded-md bg-violet-500/25 px-1.5 py-0.5 font-medium text-violet-800 dark:text-violet-200">
-                            Master admin
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2 gap-y-1">
+                          <h3 className="text-base font-semibold tracking-tight text-fg md:text-lg">{p.full_name}</h3>
+                          {isYou ? (
+                            <span className="rounded-full bg-[rgb(var(--accent)/0.2)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-fg ring-1 ring-[rgb(var(--accent)/0.25)]">
+                              You
+                            </span>
+                          ) : null}
+                          <span className="inline-flex items-center gap-1 rounded-full border border-token-soft bg-surface/70 px-2.5 py-0.5 text-[11px] font-medium capitalize text-fg-soft">
+                            <UserRound className="h-3 w-3 opacity-70" strokeWidth={2} />
+                            {p.role}
                           </span>
-                        ) : null}
-                        {p.platform_admin ? (
-                          <span className="ml-2 rounded-md bg-amber-500/20 px-1.5 py-0.5 text-amber-800 dark:text-amber-200">
-                            Admin
-                          </span>
-                        ) : null}
-                        {p.banned_at ? (
-                          <span className="ml-2 text-rose-600 dark:text-rose-400">Banned</span>
-                        ) : null}
+                          {master ? (
+                            <span className="rounded-full border border-violet-400/35 bg-violet-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-violet-200">
+                              Master admin
+                            </span>
+                          ) : null}
+                          {p.platform_admin && !master ? (
+                            <span className="rounded-full border border-amber-500/35 bg-amber-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-amber-200">
+                              Admin
+                            </span>
+                          ) : null}
+                          {p.banned_at ? (
+                            <span className="rounded-full border border-rose-500/40 bg-rose-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-rose-300">
+                              Banned
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="mt-1.5 truncate text-sm text-fg-soft">{p.email}</p>
                       </div>
-                    </td>
-                    <td className="border-b border-token-soft/60 py-3 pr-3 text-fg-soft">
-                      {p.organization_name ?? "—"}
-                    </td>
-                    <td className="border-b border-token-soft/60 py-3 pr-3 text-xs text-fg-soft">
-                      <div>Status: {p.subscription_status ?? "—"}</div>
-                      <div>Ends: {p.subscription_ends_at ? new Date(p.subscription_ends_at).toLocaleString() : "—"}</div>
-                      <div>Paid: {p.invoice_paid_at ? new Date(p.invoice_paid_at).toLocaleString() : "—"}</div>
-                    </td>
-                    <td className="border-b border-token-soft/60 py-3">
+                    </div>
+
+                    <div className="flex w-full shrink-0 flex-col gap-3 sm:flex-row lg:w-auto lg:flex-col lg:gap-3">
+                      <div className="flex min-w-[200px] flex-1 flex-col gap-2 rounded-2xl border border-token-soft/80 bg-surface/40 p-4 dark:bg-[rgb(var(--surface)/0.5)]">
+                        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-fg-muted">
+                          <Building2 className="h-3.5 w-3.5" strokeWidth={2} />
+                          Workspace
+                        </div>
+                        <p className="text-sm font-medium text-fg">{p.organization_name ?? "—"}</p>
+                      </div>
+                      <div className="flex min-w-[200px] flex-1 flex-col gap-2 rounded-2xl border border-token-soft/80 bg-surface/40 p-4 dark:bg-[rgb(var(--surface)/0.5)]">
+                        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-fg-muted">
+                          <CreditCard className="h-3.5 w-3.5" strokeWidth={2} />
+                          Billing
+                        </div>
+                        <span
+                          className={cn(
+                            "w-fit rounded-full border px-2.5 py-0.5 text-[11px] font-semibold capitalize",
+                            subscriptionStatusClass(p.subscription_status),
+                          )}
+                        >
+                          {p.subscription_status ?? "—"}
+                        </span>
+                        <dl className="mt-1 space-y-1 text-xs text-fg-soft">
+                          <div className="flex justify-between gap-4">
+                            <dt className="text-fg-muted">Ends</dt>
+                            <dd className="text-right font-medium text-fg">
+                              {p.subscription_ends_at ? new Date(p.subscription_ends_at).toLocaleString() : "—"}
+                            </dd>
+                          </div>
+                          <div className="flex justify-between gap-4">
+                            <dt className="text-fg-muted">Paid</dt>
+                            <dd className="text-right font-medium text-fg">
+                              {p.invoice_paid_at ? new Date(p.invoice_paid_at).toLocaleString() : "—"}
+                            </dd>
+                          </div>
+                        </dl>
+                      </div>
+                    </div>
+
+                    <div className="min-w-0 flex-1 lg:max-w-md">
                       {master ? (
-                        <p className="max-w-xs text-xs leading-relaxed text-fg-soft">
-                          This account is locked as <span className="font-medium text-fg">owner</span> and{" "}
-                          <span className="font-medium text-fg">platform admin</span>. Role, admin flag, and ban controls
-                          are disabled here and enforced in the database.
-                        </p>
+                        <div className="flex gap-3 rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-500/15 to-[rgb(var(--accent)/0.08)] p-4 ring-1 ring-violet-400/10">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/25 text-violet-200">
+                            <ShieldCheck className="h-5 w-5" strokeWidth={2} />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-fg">Protected master account</p>
+                            <p className="mt-1 text-xs leading-relaxed text-fg-soft">
+                              Locked as <span className="font-medium text-fg">owner</span> and{" "}
+                              <span className="font-medium text-fg">platform admin</span>. Role, admin flag, and ban
+                              controls are enforced in the database—not editable here.
+                            </p>
+                          </div>
+                        </div>
                       ) : (
-                        <>
+                        <div className="space-y-4 rounded-2xl border border-token-soft/80 bg-surface/30 p-4 dark:bg-[rgb(var(--surface)/0.35)]">
+                          <p className="text-[11px] font-semibold uppercase tracking-wider text-fg-muted">Controls</p>
                           <form
-                            className="mb-3 flex flex-wrap items-end gap-2"
+                            className="flex flex-wrap items-end gap-3 border-b border-token-soft/50 pb-4"
                             action={(fd) => runAction(adminUpdateUserRoleAction, fd)}
                           >
                             <input type="hidden" name="user_id" value={p.id} />
@@ -329,30 +416,30 @@ export function AdminPanel({
                               <select
                                 name="role"
                                 defaultValue={p.role}
-                                className="mt-1 block rounded-xl border border-token-soft bg-surface/80 px-2 py-1.5 text-sm text-fg"
+                                className="mt-1.5 block min-w-[8.5rem] rounded-xl border border-token-soft bg-surface/90 px-3 py-2 text-sm text-fg shadow-sm"
                               >
                                 <option value="member">member</option>
                                 <option value="manager">manager</option>
                                 <option value="owner">owner</option>
                               </select>
                             </label>
-                            <label className="flex items-center gap-1.5 text-xs text-fg-soft">
+                            <label className="flex cursor-pointer items-center gap-2 pb-2 text-xs text-fg-soft">
                               <input type="checkbox" name="force_billing" className="rounded border-token-soft" />
                               Force (ignore invoice)
                             </label>
                             <button
                               type="submit"
-                              className="rounded-xl bg-[rgb(var(--accent))] px-3 py-1.5 text-xs font-semibold text-white"
+                              className="rounded-xl bg-[rgb(var(--accent))] px-4 py-2 text-xs font-semibold text-white shadow-[0_8px_24px_rgb(var(--accent)/0.35)]"
                             >
                               Save role
                             </button>
                           </form>
                           <form
-                            className="mb-3 flex flex-wrap items-end gap-2"
+                            className="flex flex-wrap items-center gap-3 border-b border-token-soft/50 pb-4"
                             action={(fd) => runAction(adminSetPlatformAdminAction, fd)}
                           >
                             <input type="hidden" name="user_id" value={p.id} />
-                            <label className="flex items-center gap-1.5 text-xs text-fg-soft">
+                            <label className="flex cursor-pointer items-center gap-2 text-xs text-fg-soft">
                               <input
                                 type="checkbox"
                                 name="is_admin"
@@ -363,14 +450,14 @@ export function AdminPanel({
                             </label>
                             <button
                               type="submit"
-                              className="rounded-xl border border-token-soft bg-surface/80 px-3 py-1.5 text-xs font-semibold text-fg"
+                              className="rounded-xl border border-token-soft bg-surface/90 px-4 py-2 text-xs font-semibold text-fg shadow-sm"
                             >
                               Save admin flag
                             </button>
                           </form>
                           <form className="flex flex-col gap-2" action={(fd) => runAction(adminSetBanAction, fd)}>
                             <input type="hidden" name="user_id" value={p.id} />
-                            <label className="flex items-center gap-1.5 text-xs text-fg-soft">
+                            <label className="flex cursor-pointer items-center gap-2 text-xs text-fg-soft">
                               <input
                                 type="checkbox"
                                 name="banned"
@@ -383,23 +470,23 @@ export function AdminPanel({
                               name="reason"
                               placeholder="Ban note (optional)"
                               defaultValue={p.ban_reason ?? ""}
-                              className="w-full max-w-xs rounded-xl border border-token-soft bg-surface/80 px-2 py-1.5 text-xs text-fg"
+                              className="w-full rounded-xl border border-token-soft bg-surface/90 px-3 py-2 text-xs text-fg"
                             />
                             <button
                               type="submit"
-                              className="w-fit rounded-xl border border-rose-500/40 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-700 dark:text-rose-300"
+                              className="w-fit rounded-xl border border-rose-500/45 bg-rose-500/12 px-4 py-2 text-xs font-semibold text-rose-700 dark:text-rose-300"
                             >
                               Update ban
                             </button>
                           </form>
-                        </>
+                        </div>
                       )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </GlassCard>
       ) : null}
 
