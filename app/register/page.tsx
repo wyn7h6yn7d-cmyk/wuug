@@ -148,8 +148,16 @@ function RegisterPageInner() {
               const firstName = String(fd.get("first_name") ?? "");
               const lastName = String(fd.get("last_name") ?? "");
               const fullName = [firstName, lastName].map((p) => p.trim()).filter(Boolean).join(" ");
-              const email = String(fd.get("email") ?? "");
+              // Disabled inputs are omitted from FormData; invite flow locks email with readOnly + fallback.
+              const emailRaw = String(fd.get("email") ?? "").trim();
+              const email = (inviteToken && invite?.email ? invite.email : emailRaw).trim().toLowerCase();
               const password = String(fd.get("password") ?? "");
+
+              if (!email || !password) {
+                setFormError("Email and password are required.");
+                setIsSubmitting(false);
+                return;
+              }
 
               try {
                 const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -214,10 +222,10 @@ function RegisterPageInner() {
                 name="organization_name"
                 type="text"
                 required={!inviteToken}
-                disabled={Boolean(inviteToken)}
+                readOnly={Boolean(inviteToken)}
                 defaultValue={invite?.organization_name ?? ""}
                 placeholder="My company LLC"
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 disabled:cursor-not-allowed disabled:opacity-70 focus:outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 read-only:cursor-not-allowed read-only:opacity-70 focus:outline-none"
               />
             </label>
 
@@ -250,10 +258,11 @@ function RegisterPageInner() {
                 name="email"
                 type="email"
                 required
+                autoComplete="email"
                 defaultValue={invite?.email ?? ""}
-                disabled={Boolean(inviteToken)}
+                readOnly={Boolean(inviteToken)}
                 placeholder="name@company.com"
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 disabled:cursor-not-allowed disabled:opacity-70 focus:outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 read-only:cursor-not-allowed read-only:opacity-70 focus:outline-none"
               />
             </label>
 
