@@ -158,11 +158,14 @@ export function AdminPanel({
                 Admin RPCs only return rows when <code className="rounded bg-surface/80 px-1">is_platform_admin()</code>{" "}
                 is true for your session. Common causes: empty or stale{" "}
                 <code className="rounded bg-surface/80 px-1">profiles.email</code> hiding your JWT email, or OAuth email
-                only in <code className="rounded bg-surface/80 px-1">user_metadata</code>. Apply{" "}
-                <code className="rounded bg-surface/80 px-1">20260209180000_master_admin_session_email_fallback.sql</code>{" "}
-                (then <code className="rounded bg-surface/80 px-1">supabase db push</code> or run it in the SQL editor)
-                and refresh. If the <code className="rounded bg-surface/80 px-1">profiles</code> table is empty, add users
-                first — there is nothing to list yet.
+                only in <code className="rounded bg-surface/80 px-1">user_metadata</code>.                 Run the latest SQL in{" "}
+                <code className="rounded bg-surface/80 px-1">supabase/migrations/</code> through{" "}
+                <code className="rounded bg-surface/80 px-1">20260209190000_master_admin_session_auth_users.sql</code>{" "}
+                (<code className="rounded bg-surface/80 px-1">supabase db push</code> or paste in the SQL editor), then
+                refresh. Open <span className="font-medium text-fg">Workspaces</span> too — if every tab is empty, your
+                session still is not seen as platform admin. If only Users is empty, check{" "}
+                <code className="rounded bg-surface/80 px-1">select count(*) from public.profiles</code> in SQL (no rows
+                means nothing to list).
               </p>
             </div>
           ) : null}
