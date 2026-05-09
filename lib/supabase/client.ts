@@ -1,9 +1,20 @@
 import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+function normalizeSupabaseUrl(raw: string) {
+  const trimmed = raw.trim().replace(/\/+$/, "");
+  try {
+    const u = new URL(trimmed);
+    return u.origin;
+  } catch {
+    return trimmed;
+  }
+}
+
 export function createClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const urlRaw = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const url = urlRaw ? normalizeSupabaseUrl(urlRaw) : undefined;
 
   if (!url || !anonKey) {
     // During builds / preview environments we still want Next to compile + prerender.
