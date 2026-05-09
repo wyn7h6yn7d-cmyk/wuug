@@ -39,6 +39,22 @@ function isAuthRoute(pathname: string) {
   return pathname === "/login" || pathname === "/signup" || pathname === "/register";
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const t = window.setTimeout(() => reject(new Error(`${label} timed out`)), ms);
+    promise.then(
+      (value) => {
+        window.clearTimeout(t);
+        resolve(value);
+      },
+      (err) => {
+        window.clearTimeout(t);
+        reject(err);
+      },
+    );
+  });
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -53,62 +69,86 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const role = profile?.role ?? null;
 
   const refreshProfile = React.useCallback(async () => {
-    const currentUser = user ?? (await supabase.auth.getUser()).data.user ?? null;
-    if (!currentUser) {
+    try {
+      // Always read the session user from Supabase — avoids stale React `user` during auth transitions.
+      const {
+        data: { user: currentUser },
+      } = await withTimeout(supabase.auth.getUser(), 6000, "auth.getUser");
+      if (!currentUser) {
+        setProfile(null);
+        setOrganization(null);
+        return;
+      }
+
+      const { data: profileRow, error: profileError } = await withTimeout(
+        supabase
+          .from("profiles")
+          .select("id, organization_id, full_name, email, avatar_url, role")
+          .eq("id", currentUser.id)
+          .maybeSingle(),
+        6000,
+        "profiles.select",
+      );
+
+      if (profileError || !profileRow) {
+        setProfile(null);
+        setOrganization(null);
+        return;
+      }
+
+      const nextProfile = profileRow as Profile;
+      setProfile(nextProfile);
+
+      if (!nextProfile.organization_id) {
+        setOrganization(null);
+        return;
+      }
+
+      const { data: orgRow } = await withTimeout(
+        supabase
+          .from("organizations")
+          .select("id, name, logo_url, industry")
+          .eq("id", nextProfile.organization_id)
+          .maybeSingle(),
+        6000,
+        "organizations.select",
+      );
+
+      setOrganization((orgRow as Organization) ?? null);
+    } catch {
+      // Avoid indefinite loading if the network is down / Supabase is unreachable.
       setProfile(null);
       setOrganization(null);
-      return;
     }
-
-    const { data: profileRow, error: profileError } = await supabase
-      .from("profiles")
-      .select("id, organization_id, full_name, email, avatar_url, role")
-      .eq("id", currentUser.id)
-      .maybeSingle();
-
-    if (profileError || !profileRow) {
-      setProfile(null);
-      setOrganization(null);
-      return;
-    }
-
-    const nextProfile = profileRow as Profile;
-    setProfile(nextProfile);
-
-    if (!nextProfile.organization_id) {
-      setOrganization(null);
-      return;
-    }
-
-    const { data: orgRow } = await supabase
-      .from("organizations")
-      .select("id, name, logo_url, industry")
-      .eq("id", nextProfile.organization_id)
-      .maybeSingle();
-
-    setOrganization((orgRow as Organization) ?? null);
-  }, [supabase, user]);
+  }, [supabase]);
 
   React.useEffect(() => {
     let cancelled = false;
 
     async function bootstrap() {
       setIsLoading(true);
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      try {
+        const {
+          data: { session },
+        } = await withTimeout(supabase.auth.getSession(), 6000, "auth.getSession");
 
-      if (cancelled) return;
-      setUser(session?.user ?? null);
+        if (cancelled) return;
+        setUser(session?.user ?? null);
 
-      if (session?.user) {
-        await refreshProfile();
-      } else {
+        if (session?.user) {
+          await refreshProfile();
+        } else {
+          setProfile(null);
+          setOrganization(null);
+        }
+      } catch {
+        if (cancelled) return;
+        setUser(null);
         setProfile(null);
         setOrganization(null);
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
-
-      if (!cancelled) setIsLoading(false);
     }
 
     void bootstrap();
@@ -134,16 +174,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (isLoading) return;
     if (isAuthRoute(pathname)) return;
-    if (!user) router.replace("/login");
+    // Send unauthenticated users to the public landing page (not /login).
+    if (!user) router.replace("/");
   }, [isLoading, pathname, router, user]);
 
   const signOut = React.useCallback(async () => {
     await supabase.auth.signOut();
-    setUser(null);
-    setProfile(null);
-    setOrganization(null);
-    router.replace("/login");
-  }, [router, supabase]);
+    // Full navigation avoids a race: the "no user" effect would otherwise redirect to /login while still on a platform route.
+    window.location.assign("/");
+  }, [supabase]);
 
   const value = React.useMemo<AuthContextValue>(
     () => ({

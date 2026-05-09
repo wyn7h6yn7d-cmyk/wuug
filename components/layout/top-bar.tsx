@@ -7,7 +7,7 @@ import { CreateItemFlow } from "@/components/actions/create-item-flow";
 import { useAuth } from "@/components/providers/auth-provider";
 
 export function TopBar() {
-  const { profile, isLoading, signOut } = useAuth();
+  const { profile, user, isLoading, signOut } = useAuth();
   const [open, setOpen] = React.useState(false);
   const accountRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -22,13 +22,17 @@ export function TopBar() {
     return () => window.removeEventListener("mousedown", onDown);
   }, [open]);
 
+  const displayName = profile?.full_name?.trim() || user?.email?.trim() || "";
+
   const initials =
-    profile?.full_name
-      ?.split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((p) => p[0]?.toUpperCase())
-      .join("") ?? "U";
+    displayName.length > 0
+      ? displayName
+          .split(/[\s@]+/)
+          .filter(Boolean)
+          .slice(0, 2)
+          .map((p) => p[0]?.toUpperCase())
+          .join("") || "U"
+      : "U";
 
   return (
     <header className="mb-6 flex flex-col gap-4 rounded-[24px] border border-[#E5EAF3] bg-white/90 p-4 shadow-[0_8px_30px_rgba(66,86,122,0.08)] md:flex-row md:items-center md:justify-between">
@@ -79,7 +83,7 @@ export function TopBar() {
               {initials}
             </span>
             <span className="text-sm font-medium text-slate-700">
-              {isLoading ? "Loading…" : profile?.full_name ?? "My account"}
+              {isLoading ? "Loading…" : displayName || "My account"}
             </span>
             <ChevronDown className="h-4 w-4 text-slate-500" />
           </button>
@@ -88,9 +92,9 @@ export function TopBar() {
             <div className="absolute right-0 z-40 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_40px_rgba(66,86,122,0.12)]">
               <div className="px-4 py-3">
                 <div className="text-sm font-semibold text-slate-900">
-                  {profile?.full_name ?? "Account"}
+                  {displayName || "Account"}
                 </div>
-                <div className="text-xs text-slate-500">{profile?.email ?? ""}</div>
+                <div className="text-xs text-slate-500">{profile?.email ?? user?.email ?? ""}</div>
               </div>
               <div className="h-px bg-slate-100" />
               <Link

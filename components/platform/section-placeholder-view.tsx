@@ -1,7 +1,7 @@
 import { GlassCard } from "@/components/command-center/glass-card";
 import { GradientButton } from "@/components/command-center/gradient-button";
-import { PulseBadge } from "@/components/command-center/pulse-badge";
 import { PageHeader } from "@/components/ui/page-header";
+import Link from "next/link";
 
 type SectionPlaceholderViewProps = {
   title: string;
@@ -15,8 +15,9 @@ export function SectionPlaceholderView({ title, subtitle, highlights }: SectionP
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <PageHeader title={title} subtitle={subtitle} />
         <div className="flex items-center gap-2">
-          <PulseBadge label="Mock data" tone="neutral" />
-          <GradientButton variant="secondary">Create new</GradientButton>
+          <Link href="/tasks">
+            <GradientButton variant="secondary">Open tasks</GradientButton>
+          </Link>
         </div>
       </div>
 
@@ -44,9 +45,15 @@ export function SectionPlaceholderView({ title, subtitle, highlights }: SectionP
             This is where we’ll collect suggestions and one-click actions—without turning the product into “more tables”.
           </p>
           <div className="mt-4 grid gap-2">
-            <GradientButton>Create plan</GradientButton>
-            <GradientButton variant="secondary">Draft message</GradientButton>
-            <GradientButton variant="ghost">Open radar</GradientButton>
+            <Link href="/tasks">
+              <GradientButton>Create plan</GradientButton>
+            </Link>
+            <Link href="/clients">
+              <GradientButton variant="secondary">Draft message</GradientButton>
+            </Link>
+            <Link href="/radar">
+              <GradientButton variant="ghost">Open radar</GradientButton>
+            </Link>
           </div>
         </GlassCard>
       </div>

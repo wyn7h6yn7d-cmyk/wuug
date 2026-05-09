@@ -10,7 +10,7 @@ export default async function PlatformLayout({
 }>) {
   const supabase = createClient(await cookies());
   const { data } = await supabase.auth.getUser();
-  if (!data.user) redirect("/login");
+  if (!data.user) redirect("/");
 
   return <AppShell>{children}</AppShell>;
 }
