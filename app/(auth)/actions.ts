@@ -34,7 +34,12 @@ export async function signIn(formData: FormData) {
 
 export async function signUp(formData: FormData) {
   const organizationName = String(formData.get("organization_name") ?? "");
-  const fullName = String(formData.get("full_name") ?? "");
+  const firstName = String(formData.get("first_name") ?? "");
+  const lastName = String(formData.get("last_name") ?? "");
+  const fullName = [firstName, lastName]
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(" ");
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
 

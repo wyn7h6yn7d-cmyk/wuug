@@ -6,188 +6,6 @@
 create extension if not exists "pgcrypto";
 
 -- ============================================================================
--- Helper functions (RLS)
--- ============================================================================
--- SECURITY DEFINER is used only where necessary to avoid RLS recursion.
--- All functions are read-only and return derived data about auth.uid().
-
-create or replace function public.get_my_organization_id()
-returns uuid
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select p.organization_id
-  from public.profiles p
-  where p.id = auth.uid()
-$$;
-
-create or replace function public.get_my_role()
-returns text
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select p.role
-  from public.profiles p
-  where p.id = auth.uid()
-$$;
-
-create or replace function public.is_manager_or_owner()
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select coalesce(public.get_my_role() in ('owner', 'manager'), false)
-$$;
-
--- ============================================================================
--- Invitation helpers
--- ============================================================================
-
--- Create a new workspace (organization + owner profile) for the authenticated user.
--- This is used for first-time registration. We keep RLS tight and do this via a SECURITY DEFINER.
-create or replace function public.create_workspace(p_organization_name text, p_full_name text)
-returns void
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  v_org_id uuid;
-  v_email text;
-begin
-  if auth.uid() is null then
-    raise exception 'not_authenticated';
-  end if;
-
-  v_email := lower(coalesce(auth.jwt() ->> 'email', ''));
-  if v_email = '' then
-    raise exception 'missing_email';
-  end if;
-
-  insert into public.organizations (name)
-  values (coalesce(nullif(p_organization_name, ''), 'My workspace'))
-  returning id into v_org_id;
-
-  insert into public.profiles (id, organization_id, full_name, email, role)
-  values (
-    auth.uid(),
-    v_org_id,
-    coalesce(nullif(p_full_name, ''), split_part(v_email, '@', 1)),
-    v_email,
-    'owner'
-  )
-  on conflict (id) do update set
-    organization_id = excluded.organization_id,
-    full_name = excluded.full_name,
-    email = excluded.email,
-    role = excluded.role,
-    updated_at = now();
-end;
-$$;
-
-grant execute on function public.create_workspace(text, text) to authenticated;
-
--- Public, token-scoped read for invite-based registration.
--- Exposes only non-sensitive fields and only for valid (unaccepted, unexpired) invitations.
-create or replace function public.get_invitation_public(p_token text)
-returns table (
-  organization_id uuid,
-  organization_name text,
-  email text,
-  role text,
-  expires_at timestamptz,
-  created_at timestamptz
-)
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select
-    i.organization_id,
-    o.name as organization_name,
-    i.email,
-    i.role,
-    i.expires_at,
-    i.created_at
-  from public.invitations i
-  join public.organizations o on o.id = i.organization_id
-  where i.token = p_token
-    and i.accepted_at is null
-    and (i.expires_at is null or i.expires_at > now())
-  limit 1
-$$;
-
-grant execute on function public.get_invitation_public(text) to anon, authenticated;
-
--- Accept an invitation and create the caller's profile in the invited org.
--- Must be called AFTER the user is authenticated (i.e. after sign up).
-create or replace function public.accept_invitation(p_token text, p_full_name text)
-returns text
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  v_org_id uuid;
-  v_email text;
-  v_role text;
-  v_jwt_email text;
-begin
-  if auth.uid() is null then
-    raise exception 'not_authenticated';
-  end if;
-
-  select i.organization_id, i.email, i.role
-    into v_org_id, v_email, v_role
-  from public.invitations i
-  where i.token = p_token
-    and i.accepted_at is null
-    and (i.expires_at is null or i.expires_at > now())
-  for update;
-
-  if v_org_id is null then
-    raise exception 'invalid_or_expired_invite';
-  end if;
-
-  v_jwt_email := lower(coalesce(auth.jwt() ->> 'email', ''));
-  if v_jwt_email = '' or lower(v_email) <> v_jwt_email then
-    raise exception 'invite_email_mismatch';
-  end if;
-
-  insert into public.profiles (id, organization_id, full_name, email, role)
-  values (
-    auth.uid(),
-    v_org_id,
-    coalesce(nullif(p_full_name, ''), split_part(v_email, '@', 1)),
-    v_email,
-    case when v_role = 'manager' then 'manager' else 'member' end
-  )
-  on conflict (id) do update set
-    organization_id = excluded.organization_id,
-    full_name = excluded.full_name,
-    email = excluded.email,
-    role = excluded.role,
-    updated_at = now();
-
-  update public.invitations
-    set accepted_at = now()
-  where token = p_token
-    and accepted_at is null;
-
-  return v_role;
-end;
-$$;
-
-grant execute on function public.accept_invitation(text, text) to authenticated;
-
--- ============================================================================
 -- Tables
 -- ============================================================================
 
@@ -384,6 +202,183 @@ begin
     for each row execute function public.set_updated_at();
   end if;
 end $$;
+
+-- ============================================================================
+-- Helper functions (RLS) + onboarding RPCs
+-- ============================================================================
+-- Defined AFTER tables to avoid missing-relation errors on first run.
+
+-- SECURITY DEFINER is used only where necessary to avoid RLS recursion.
+-- All functions are scoped to auth.uid() and return derived info.
+
+create or replace function public.get_my_organization_id()
+returns uuid
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select p.organization_id
+  from public.profiles p
+  where p.id = auth.uid()
+$$;
+
+create or replace function public.get_my_role()
+returns text
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select p.role
+  from public.profiles p
+  where p.id = auth.uid()
+$$;
+
+create or replace function public.is_manager_or_owner()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(public.get_my_role() in ('owner', 'manager'), false)
+$$;
+
+-- Create a new workspace (organization + owner profile) for the authenticated user.
+create or replace function public.create_workspace(p_organization_name text, p_full_name text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_org_id uuid;
+  v_email text;
+begin
+  if auth.uid() is null then
+    raise exception 'not_authenticated';
+  end if;
+
+  v_email := lower(coalesce(auth.jwt() ->> 'email', ''));
+  if v_email = '' then
+    raise exception 'missing_email';
+  end if;
+
+  insert into public.organizations (name)
+  values (coalesce(nullif(p_organization_name, ''), 'My workspace'))
+  returning id into v_org_id;
+
+  insert into public.profiles (id, organization_id, full_name, email, role)
+  values (
+    auth.uid(),
+    v_org_id,
+    coalesce(nullif(p_full_name, ''), split_part(v_email, '@', 1)),
+    v_email,
+    'owner'
+  )
+  on conflict (id) do update set
+    organization_id = excluded.organization_id,
+    full_name = excluded.full_name,
+    email = excluded.email,
+    role = excluded.role,
+    updated_at = now();
+end;
+$$;
+
+grant execute on function public.create_workspace(text, text) to authenticated;
+
+-- Public, token-scoped read for invite-based registration.
+create or replace function public.get_invitation_public(p_token text)
+returns table (
+  organization_id uuid,
+  organization_name text,
+  email text,
+  role text,
+  expires_at timestamptz,
+  created_at timestamptz
+)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select
+    i.organization_id,
+    o.name as organization_name,
+    i.email,
+    i.role,
+    i.expires_at,
+    i.created_at
+  from public.invitations i
+  join public.organizations o on o.id = i.organization_id
+  where i.token = p_token
+    and i.accepted_at is null
+    and (i.expires_at is null or i.expires_at > now())
+  limit 1
+$$;
+
+grant execute on function public.get_invitation_public(text) to anon, authenticated;
+
+-- Accept an invitation and create the caller's profile in the invited org.
+create or replace function public.accept_invitation(p_token text, p_full_name text)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_org_id uuid;
+  v_email text;
+  v_role text;
+  v_jwt_email text;
+begin
+  if auth.uid() is null then
+    raise exception 'not_authenticated';
+  end if;
+
+  select i.organization_id, i.email, i.role
+    into v_org_id, v_email, v_role
+  from public.invitations i
+  where i.token = p_token
+    and i.accepted_at is null
+    and (i.expires_at is null or i.expires_at > now())
+  for update;
+
+  if v_org_id is null then
+    raise exception 'invalid_or_expired_invite';
+  end if;
+
+  v_jwt_email := lower(coalesce(auth.jwt() ->> 'email', ''));
+  if v_jwt_email = '' or lower(v_email) <> v_jwt_email then
+    raise exception 'invite_email_mismatch';
+  end if;
+
+  insert into public.profiles (id, organization_id, full_name, email, role)
+  values (
+    auth.uid(),
+    v_org_id,
+    coalesce(nullif(p_full_name, ''), split_part(v_email, '@', 1)),
+    v_email,
+    case when v_role = 'manager' then 'manager' else 'member' end
+  )
+  on conflict (id) do update set
+    organization_id = excluded.organization_id,
+    full_name = excluded.full_name,
+    email = excluded.email,
+    role = excluded.role,
+    updated_at = now();
+
+  update public.invitations
+    set accepted_at = now()
+  where token = p_token
+    and accepted_at is null;
+
+  return v_role;
+end;
+$$;
+
+grant execute on function public.accept_invitation(text, text) to authenticated;
 
 -- ============================================================================
 -- RLS

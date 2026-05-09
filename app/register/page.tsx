@@ -126,7 +126,9 @@ function RegisterPageInner() {
 
               const fd = new FormData(event.currentTarget);
               const organizationName = String(fd.get("organization_name") ?? "");
-              const fullName = String(fd.get("full_name") ?? "");
+              const firstName = String(fd.get("first_name") ?? "");
+              const lastName = String(fd.get("last_name") ?? "");
+              const fullName = [firstName, lastName].map((p) => p.trim()).filter(Boolean).join(" ");
               const email = String(fd.get("email") ?? "");
               const password = String(fd.get("password") ?? "");
 
@@ -192,15 +194,28 @@ function RegisterPageInner() {
               />
             </label>
 
-            <label className="block">
-              <span className="mb-1.5 block text-sm font-medium text-slate-700">Full name</span>
-              <input
-                name="full_name"
-                type="text"
-                placeholder="First Last"
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"
-              />
-            </label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-slate-700">First name</span>
+                <input
+                  name="first_name"
+                  type="text"
+                  autoComplete="given-name"
+                  placeholder="First"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-slate-700">Last name</span>
+                <input
+                  name="last_name"
+                  type="text"
+                  autoComplete="family-name"
+                  placeholder="Last"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"
+                />
+              </label>
+            </div>
 
             <label className="block">
               <span className="mb-1.5 block text-sm font-medium text-slate-700">Email</span>
