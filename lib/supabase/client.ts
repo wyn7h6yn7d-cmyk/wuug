@@ -31,6 +31,12 @@ export function createClient() {
           return { data: { subscription: { unsubscribe() {} } } };
         },
         async signOut() {},
+        async updateUser() {
+          return {
+            data: { user: null },
+            error: { message: "Supabase auth is not configured in this environment." } as Error,
+          };
+        },
       },
       from() {
         return {

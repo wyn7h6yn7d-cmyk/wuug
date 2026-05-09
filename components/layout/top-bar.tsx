@@ -8,7 +8,7 @@ import { useAuth } from "@/components/providers/auth-provider";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function TopBar() {
-  const { profile, user, isLoading, signOut } = useAuth();
+  const { profile, user, organization, isLoading, signOut } = useAuth();
   const [open, setOpen] = React.useState(false);
   const accountRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -24,6 +24,8 @@ export function TopBar() {
   }, [open]);
 
   const displayName = profile?.full_name?.trim() || user?.email?.trim() || "";
+  const companyName = organization?.name?.trim() ?? "";
+  const accountPillLabel = companyName || displayName || "";
 
   const initials =
     displayName.length > 0
@@ -85,8 +87,8 @@ export function TopBar() {
             <span className="flex h-8 w-8 items-center justify-center rounded-xl gradient-sheen text-xs font-bold text-white">
               {initials}
             </span>
-            <span className="hidden max-w-[140px] truncate text-sm font-medium text-fg lg:inline">
-              {isLoading ? "Loading…" : displayName || "My account"}
+            <span className="hidden max-w-[180px] truncate text-sm font-medium text-fg md:inline">
+              {isLoading ? "Loading…" : accountPillLabel || "My account"}
             </span>
             <ChevronDown className="h-4 w-4 text-fg-soft" />
           </button>
