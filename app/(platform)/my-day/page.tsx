@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { ArrowRight, Clock, Handshake, ListTodo, Sparkles } from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { CommandBar } from "@/components/command-center/command-bar";
 import { GlassCard } from "@/components/command-center/glass-card";
@@ -123,16 +123,16 @@ export default async function MyDayPage() {
 
         <div className="xl:col-span-12">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <InsightCard icon={ListTodo} tone="accent" label="My tasks" value={tasks.length} meta="open and assigned" />
+            <InsightCard icon="list-todo" tone="accent" label="My tasks" value={tasks.length} meta="open and assigned" />
             <InsightCard
-              icon={Handshake}
+              icon="handshake"
               tone="calm"
               label="My promises"
               value={promises.length}
               meta="active commitments"
             />
-            <InsightCard icon={Clock} tone="warn" label="Waiting on client" value={waiting.length} meta="blocked items" />
-            <InsightCard icon={Sparkles} tone="neutral" label="Drafts ready" value="—" meta="AI suggestions live" />
+            <InsightCard icon="clock" tone="warn" label="Waiting on client" value={waiting.length} meta="blocked items" />
+            <InsightCard icon="sparkles" tone="neutral" label="Drafts ready" value="—" meta="AI suggestions live" />
           </div>
         </div>
 

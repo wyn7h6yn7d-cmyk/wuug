@@ -47,6 +47,7 @@ export function PressableLink({
       whileHover={btnHoverLift(lift)}
       whileTap={BTN_TAP}
       transition={BTN_SPRING}
+      style={{ willChange: "transform" }}
     >
       {children}
     </MotionLink>

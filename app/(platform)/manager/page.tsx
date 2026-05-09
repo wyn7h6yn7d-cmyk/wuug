@@ -1,15 +1,6 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
-import {
-  ArrowRight,
-  Clock,
-  Handshake,
-  ListTodo,
-  Radar as RadarIcon,
-  ShieldAlert,
-  Sparkles,
-  Users,
-} from "lucide-react";
+import { ArrowRight, Clock, Radar as RadarIcon, Sparkles, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { CommandBar } from "@/components/command-center/command-bar";
 import { GlassCard } from "@/components/command-center/glass-card";
@@ -158,10 +149,10 @@ export default async function ManagerPage() {
         {/* Stat strip */}
         <div className="xl:col-span-12">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <InsightCard icon={ListTodo} tone="accent" label="Open tasks" value={openTasks} meta="across the org" />
-            <InsightCard icon={Handshake} tone="calm" label="Active promises" value={activePromises} meta="commitments live" />
-            <InsightCard icon={Users} tone="neutral" label="Clients" value={clientCount} meta="in your workspace" />
-            <InsightCard icon={ShieldAlert} tone="risk" label="Overdue" value={overdueTasks} meta="needs attention" />
+            <InsightCard icon="list-todo" tone="accent" label="Open tasks" value={openTasks} meta="across the org" />
+            <InsightCard icon="handshake" tone="calm" label="Active promises" value={activePromises} meta="commitments live" />
+            <InsightCard icon="users" tone="neutral" label="Clients" value={clientCount} meta="in your workspace" />
+            <InsightCard icon="shield-alert" tone="risk" label="Overdue" value={overdueTasks} meta="needs attention" />
           </div>
         </div>
 

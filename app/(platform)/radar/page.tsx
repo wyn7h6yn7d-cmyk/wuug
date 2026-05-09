@@ -259,10 +259,10 @@ export default async function RadarPage() {
         {/* Stat strip */}
         <div className="xl:col-span-12">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <InsightCard icon={AlertTriangle} tone="risk" label="At risk" value={atRiskCount} meta="immediate attention" />
-            <InsightCard icon={PauseCircle} tone="warn" label="Stuck" value={stuckCount} meta="quiet for days" />
-            <InsightCard icon={Timer} tone="accent" label="Due soon" value={dueCount} meta="this week" />
-            <InsightCard icon={UserRound} tone="neutral" label="No owner" value={missingCount} meta="needs assignee" />
+            <InsightCard icon="alert-triangle" tone="risk" label="At risk" value={atRiskCount} meta="immediate attention" />
+            <InsightCard icon="pause-circle" tone="warn" label="Stuck" value={stuckCount} meta="quiet for days" />
+            <InsightCard icon="timer" tone="accent" label="Due soon" value={dueCount} meta="this week" />
+            <InsightCard icon="user-round" tone="neutral" label="No owner" value={missingCount} meta="needs assignee" />
           </div>
         </div>
 

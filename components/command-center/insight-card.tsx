@@ -1,12 +1,41 @@
 "use client";
 
-import * as React from "react";
 import { motion } from "framer-motion";
-import { LucideIcon } from "lucide-react";
+import {
+  AlertTriangle,
+  Clock,
+  Handshake,
+  ListTodo,
+  PauseCircle,
+  ShieldAlert,
+  Sparkles,
+  Timer,
+  UserRound,
+  Users,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const GLYPHS = {
+  "alert-triangle": AlertTriangle,
+  clock: Clock,
+  handshake: Handshake,
+  "list-todo": ListTodo,
+  "pause-circle": PauseCircle,
+  "shield-alert": ShieldAlert,
+  sparkles: Sparkles,
+  timer: Timer,
+  "user-round": UserRound,
+  users: Users,
+  zap: Zap,
+} as const satisfies Record<string, LucideIcon>;
+
+export type InsightCardGlyph = keyof typeof GLYPHS;
+
 type InsightCardProps = {
-  icon: LucideIcon;
+  /** Serializable icon id — do not pass Lucide components from Server Components. */
+  icon: InsightCardGlyph;
   label: string;
   value: string | number;
   meta?: string;
@@ -23,13 +52,14 @@ const toneToColor: Record<NonNullable<InsightCardProps["tone"]>, string> = {
 };
 
 export function InsightCard({
-  icon: Icon,
+  icon,
   label,
   value,
   meta,
   tone = "neutral",
   className,
 }: InsightCardProps) {
+  const Icon = GLYPHS[icon];
   const color = toneToColor[tone];
   return (
     <motion.div

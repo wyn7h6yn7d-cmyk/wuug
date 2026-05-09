@@ -250,7 +250,8 @@ function RegisterPageInner() {
 
             <AuthSubmitButton
               variant={inviteToken ? "join-workspace" : "create-account"}
-              disabled={isSubmitting || (Boolean(inviteToken) && (isLoadingInvite || inviteError))}
+              busy={isSubmitting}
+              disabled={Boolean(inviteToken) && (isLoadingInvite || inviteError)}
             />
           </form>
 

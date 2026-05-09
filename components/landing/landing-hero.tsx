@@ -3,20 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import {
-  AlertTriangle,
-  ArrowRight,
-  CheckCircle2,
-  Clock,
-  Handshake,
-  LogIn,
-  Radar as RadarIcon,
-  ShieldAlert,
-  Sparkles,
-  UserPlus,
-  Users,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, CheckCircle2, LogIn, Radar as RadarIcon, Sparkles, UserPlus } from "lucide-react";
 import { CommandBar } from "@/components/command-center/command-bar";
 import { GlassCard } from "@/components/command-center/glass-card";
 import { PressableLink } from "@/components/ui/pressable-link";
@@ -124,28 +111,28 @@ export function LandingHero() {
             {/* Floating insight cards */}
             <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               <InsightCard
-                icon={ShieldAlert}
+                icon="shield-alert"
                 tone="risk"
                 label="Risk Radar"
                 value="4 at-risk projects"
                 meta="2 deadlines this week"
               />
               <InsightCard
-                icon={Clock}
+                icon="clock"
                 tone="warn"
                 label="Waiting on Client"
                 value="3 blocked items"
                 meta="Stuck for 5+ days"
               />
               <InsightCard
-                icon={Handshake}
+                icon="handshake"
                 tone="accent"
                 label="Promises Due"
                 value="5 this week"
                 meta="2 expire today"
               />
               <InsightCard
-                icon={Users}
+                icon="users"
                 tone="neutral"
                 label="Team Pulse"
                 value="2 overloaded"
@@ -153,7 +140,7 @@ export function LandingHero() {
                 className="hidden sm:block"
               />
               <InsightCard
-                icon={AlertTriangle}
+                icon="alert-triangle"
                 tone="warn"
                 label="Missing Owners"
                 value="3 unassigned"
@@ -161,7 +148,7 @@ export function LandingHero() {
                 className="hidden lg:block"
               />
               <InsightCard
-                icon={Zap}
+                icon="zap"
                 tone="calm"
                 label="Today's Focus"
                 value="6 actions queued"

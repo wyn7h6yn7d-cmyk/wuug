@@ -26,6 +26,7 @@ export function ThemeToggle({ className, size = "md" }: ThemeToggleProps) {
       whileTap={BTN_TAP}
       whileHover={{ scale: 1.03 }}
       transition={BTN_SPRING}
+      style={{ willChange: "transform" }}
       className={cn(
         "relative inline-flex cursor-pointer select-none items-center gap-2 rounded-full border px-1 pr-3 text-xs font-semibold outline-none",
         "border-token-soft bg-surface/70 backdrop-blur",

@@ -41,6 +41,7 @@ export function GradientButton({
       whileHover={disabled ? undefined : btnHoverLift(lift)}
       whileTap={disabled ? undefined : BTN_TAP}
       transition={BTN_SPRING}
+      style={disabled ? undefined : { willChange: "transform" }}
       className={cn(
         "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-semibold outline-none select-none",
         "focus-visible:ring-2 focus-visible:ring-[rgb(var(--ring))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]",

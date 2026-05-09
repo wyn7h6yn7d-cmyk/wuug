@@ -1,6 +1,8 @@
 "use client";
 
+import * as React from "react";
 import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 import { BTN_SPRING, BTN_TAP } from "@/lib/motion-presets";
 
 export default function GlobalError({
@@ -11,6 +13,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   const digest = error?.digest;
+  const [isReloading, startReload] = React.useTransition();
 
   return (
     <html lang="en">
@@ -34,13 +37,23 @@ export default function GlobalError({
           </div>
           <motion.button
             type="button"
-            onClick={() => reset()}
-            whileTap={BTN_TAP}
-            whileHover={{ y: -1, scale: 1.01 }}
+            disabled={isReloading}
+            aria-busy={isReloading}
+            onClick={() => startReload(() => reset())}
+            whileTap={isReloading ? undefined : BTN_TAP}
+            whileHover={isReloading ? undefined : { y: -1, scale: 1.02 }}
             transition={BTN_SPRING}
-            className="mt-4 rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
+            style={isReloading ? undefined : { willChange: "transform" }}
+            className="mt-4 inline-flex min-h-11 min-w-[8.5rem] items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-wait disabled:opacity-90"
           >
-            Reload
+            {isReloading ? (
+              <>
+                <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
+                Reloading…
+              </>
+            ) : (
+              "Reload"
+            )}
           </motion.button>
         </div>
       </body>
