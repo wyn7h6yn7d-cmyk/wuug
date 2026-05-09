@@ -48,11 +48,7 @@ const chips = [
   { key: "owner", label: "Find missing owners" },
 ];
 
-export default function RadarPage() {
-  return <RadarServer />;
-}
-
-async function RadarServer() {
+export default async function RadarPage() {
   const supabase = createClient(await cookies());
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
@@ -208,7 +204,7 @@ async function RadarServer() {
                   <SeverityRow label="Missing owner" tone="neutral" count={missingCount} />
                 </div>
                 <p className="mt-4 text-sm text-fg-soft">
-                  Pick one signal and resolve it in two minutes. wuug will draft the next step for you.
+                  Pick one signal and resolve it in two minutes. Wuug will draft the next step for you.
                 </p>
               </div>
               <div className="relative mx-auto w-full max-w-[300px]">
@@ -222,10 +218,10 @@ async function RadarServer() {
           <GlassCard className="h-full p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-base font-semibold text-fg">wuug recommends</h2>
+                <h2 className="text-base font-semibold text-fg">Wuug recommends</h2>
                 <p className="mt-1 text-sm text-fg-soft">AI-generated micro-steps for the highest-impact signals.</p>
               </div>
-              <PulseBadge label="wuug AI" tone="accent" />
+              <PulseBadge label="Wuug AI" tone="accent" />
             </div>
             <div className="mt-4 space-y-2">
               {[

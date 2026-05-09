@@ -4,7 +4,7 @@
 @variant dark (&:where(.theme-dark, .theme-dark *));
 
 /* ────────────────────────────────────────────────────────────────
-   wuug design tokens — futuristic command-center system
+   Wuug design tokens — futuristic command-center system
    Light = airy ice. Dark = cinematic deep space.
    ────────────────────────────────────────────────────────────── */
 
@@ -147,8 +147,9 @@ input,
 select,
 textarea,
 a {
+  /* Omit `transform` here — Framer Motion owns transforms on interactive controls. */
   transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease,
-    box-shadow 200ms ease, transform 200ms ease, opacity 160ms ease;
+    box-shadow 200ms ease, opacity 160ms ease;
 }
 
 button:focus-visible,

@@ -41,7 +41,7 @@ export function TopBar() {
         <Search className="h-4 w-4 text-fg-soft" />
         <input
           type="text"
-          placeholder="Ask wuug or search…"
+          placeholder="Ask Wuug or search…"
           className="w-full bg-transparent text-sm text-fg placeholder:text-fg-soft focus:outline-none"
         />
         <span className="hidden rounded-md border border-token-soft bg-bg2/80 px-1.5 py-0.5 text-[10px] font-semibold text-fg-soft md:inline">

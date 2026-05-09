@@ -3,11 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ClientsPageClient } from "@/components/clients/clients-page-client";
 import type { AppRole } from "@/lib/permissions";
 
-export default function ClientsPage() {
-  return <ClientsPageServer />;
-}
-
-async function ClientsPageServer() {
+export default async function ClientsPage() {
   const supabase = createClient(await cookies());
   const { data: userData } = await supabase.auth.getUser();
   const user = userData.user;

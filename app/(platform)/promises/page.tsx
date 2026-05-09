@@ -4,11 +4,7 @@ import { PromisesPageClient, type PromiseLookups } from "@/components/promises/p
 import { fetchPromiseLookups, fetchPromises } from "@/lib/promises";
 import type { AppRole } from "@/lib/permissions";
 
-export default function PromisesPage() {
-  return <PromisesPageServer />;
-}
-
-async function PromisesPageServer() {
+export default async function PromisesPage() {
   const supabase = createClient(await cookies());
   const { data: userData } = await supabase.auth.getUser();
   const user = userData.user;

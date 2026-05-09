@@ -78,7 +78,7 @@ export function TodaysPulseView() {
 
       <GlassCard className="p-5">
         <CommandBar
-          placeholder="Ask wuug or search clients, projects, tasks…"
+          placeholder="Ask Wuug or search clients, projects, tasks…"
           chips={commandChips}
         />
       </GlassCard>
@@ -277,7 +277,7 @@ export function TodaysPulseView() {
           <GlassCard className="p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <div className="text-sm font-semibold text-slate-900">wuug assistant</div>
+                <div className="text-sm font-semibold text-slate-900">Wuug assistant</div>
                 <p className="mt-1 text-sm text-slate-600">
                   Say one sentence — I’ll format actions, promises, and messages.
                 </p>

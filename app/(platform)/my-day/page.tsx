@@ -16,11 +16,7 @@ const chips = [
   { key: "blocked", label: "Where am I blocked?" },
 ];
 
-export default function MyDayPage() {
-  return <MyDayServer />;
-}
-
-async function MyDayServer() {
+export default async function MyDayPage() {
   const supabase = createClient(await cookies());
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;

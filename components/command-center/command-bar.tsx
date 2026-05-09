@@ -26,7 +26,7 @@ type CommandBarProps = {
 };
 
 export function CommandBar({
-  placeholder = "Ask wuug what needs attention today…",
+  placeholder = "Ask Wuug what needs attention today…",
   chips,
   className,
   compact = false,

@@ -166,12 +166,12 @@ export function RadarCommandCenterView() {
           <GlassCard className="p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <div className="text-sm font-semibold text-slate-900">wuug suggests</div>
+                <div className="text-sm font-semibold text-slate-900">Wuug suggests</div>
                 <p className="mt-1 text-sm text-slate-600">
                   Pick one signal and I’ll propose 2–3 micro-steps and a ready-to-send message.
                 </p>
               </div>
-              <PulseBadge label="wuug AI" tone="neutral" />
+              <PulseBadge label="Wuug AI" tone="neutral" />
             </div>
 
             <div className="mt-4 space-y-2">

@@ -9,13 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "wuug — the AI command center for team operations",
+  title: "Wuug — the AI command center for team operations",
   description:
-    "wuug shows what needs the next step before anything is forgotten. A living radar for clients, projects, tasks, and promises.",
-  icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/icon.svg", type: "image/svg+xml" }],
-  },
+    "Wuug shows what needs the next step before anything is forgotten. A living radar for clients, projects, tasks, and promises.",
 };
 
 export default function RootLayout({

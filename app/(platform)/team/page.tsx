@@ -4,11 +4,7 @@ import { AccessRestricted } from "@/components/access/access-restricted";
 import { TeamPageClient } from "@/components/team/team-page-client";
 import type { AppRole } from "@/lib/permissions";
 
-export default function TeamPage() {
-  return <TeamPageServer />;
-}
-
-async function TeamPageServer() {
+export default async function TeamPage() {
   const supabase = createClient(await cookies());
   const { data: userData } = await supabase.auth.getUser();
   const user = userData.user;

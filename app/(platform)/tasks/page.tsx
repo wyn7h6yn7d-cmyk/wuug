@@ -4,11 +4,7 @@ import { TasksPageClient, type TaskLookups } from "@/components/tasks/tasks-page
 import { fetchTaskLookups, fetchTasks } from "@/lib/tasks";
 import type { AppRole } from "@/lib/permissions";
 
-export default function TasksPage() {
-  return <TasksPageServer />;
-}
-
-async function TasksPageServer() {
+export default async function TasksPage() {
   const supabase = createClient(await cookies());
   const { data: userData } = await supabase.auth.getUser();
   const user = userData.user;

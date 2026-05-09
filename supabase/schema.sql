@@ -1,4 +1,4 @@
--- wuug Supabase schema (production-ready)
+-- Wuug Supabase schema (production-ready)
 -- Team-based business command center with roles: owner, manager, member.
 -- Run in Supabase SQL editor.
 
@@ -17,7 +17,7 @@ create table if not exists public.organizations (
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
-comment on table public.organizations is 'A wuug workspace/company.';
+comment on table public.organizations is 'A Wuug workspace/company.';
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,

@@ -90,7 +90,7 @@ export function LandingHero() {
               transition={{ duration: 0.55, delay: 0.05, ease: "easeOut" }}
               className="mt-5 max-w-2xl text-pretty text-base text-fg-soft sm:text-lg"
             >
-              wuug turns team activity, client work, promises, and risks into one
+              Wuug turns team activity, client work, promises, and risks into one
               intelligent command center. A nervous system for service businesses,
               not another CRM.
             </motion.p>
@@ -277,7 +277,7 @@ export function LandingHero() {
 
         <footer className="mt-16 border-t border-token-soft pt-8 text-sm text-fg-soft">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>© {new Date().getFullYear()} wuug</div>
+            <div>© {new Date().getFullYear()} Wuug</div>
             <div className="flex items-center gap-4">
               <Link href="/login" className="hover:text-fg">
                 Log in

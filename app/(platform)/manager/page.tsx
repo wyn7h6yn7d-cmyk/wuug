@@ -27,11 +27,7 @@ const heroChips = [
   { key: "draft", label: "Draft next status" },
 ];
 
-export default function ManagerPage() {
-  return <ManagerServer />;
-}
-
-async function ManagerServer() {
+export default async function ManagerPage() {
   const supabase = createClient(await cookies());
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
@@ -211,10 +207,10 @@ async function ManagerServer() {
           <GlassCard className="h-full p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold text-fg">wuug suggests</h2>
-                <p className="mt-1 text-sm text-fg-soft">Tap a suggestion — wuug drafts the next steps.</p>
+                <h2 className="text-lg font-semibold text-fg">Wuug suggests</h2>
+                <p className="mt-1 text-sm text-fg-soft">Tap a suggestion — Wuug drafts the next steps.</p>
               </div>
-              <PulseBadge label="wuug AI" tone="accent" />
+              <PulseBadge label="Wuug AI" tone="accent" />
             </div>
             <div className="mt-4 space-y-2">
               {[

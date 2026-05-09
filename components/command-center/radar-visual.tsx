@@ -37,7 +37,7 @@ export function RadarVisual({
   showScan = true,
 }: RadarVisualProps) {
   return (
-    <div className={cn("relative aspect-square w-full", className)}>
+    <div className={cn("relative aspect-square w-full overflow-hidden rounded-full", className)}>
       <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
         <defs>
           <radialGradient id="wuugRadarGlow" cx="50%" cy="50%" r="65%">
@@ -89,21 +89,18 @@ export function RadarVisual({
         })}
       </svg>
 
-      {/* Scan line */}
+      {/* Sweep: full-size layer, gradient anchored at geometric center; rotate around center (default origin). */}
       {showScan ? (
         <motion.div
-          className="absolute left-1/2 top-1/2 h-1/2 w-1/2 origin-bottom-left"
+          className="pointer-events-none absolute inset-0 rounded-full"
+          aria-hidden
           initial={{ rotate: 0 }}
           animate={{ rotate: 360 }}
           transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
           style={{
             background:
-              "conic-gradient(from 0deg, rgb(var(--accent) / 0) 0deg, rgb(var(--accent) / 0.45) 50deg, transparent 60deg)",
+              "conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgb(var(--accent) / 0.48) 14deg, rgb(var(--accent-3) / 0.22) 24deg, transparent 38deg)",
             mixBlendMode: "screen",
-            transformOrigin: "0% 0%",
-            translate: "-50% -50%",
-            width: "50%",
-            height: "50%",
           }}
         />
       ) : null}

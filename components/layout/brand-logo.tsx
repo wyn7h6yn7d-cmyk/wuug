@@ -14,7 +14,7 @@ export function BrandLogo({ className, showText = true }: BrandLogoProps) {
         <span className="absolute inset-0 rounded-2xl pulse-ring" aria-hidden />
       </span>
       {showText ? (
-        <span className="text-xl font-semibold tracking-tight text-fg">wuug</span>
+        <span className="text-xl font-semibold tracking-tight text-fg">Wuug</span>
       ) : null}
     </div>
   );
