@@ -22,7 +22,12 @@ type NavOptions = { platformAdmin?: boolean };
 
 function withAdmin(items: NavigationItem[], platformAdmin?: boolean) {
   if (!platformAdmin) return items;
-  return [...items, { href: "/admin", label: "Admin", icon: Shield }];
+  const adminItem: NavigationItem = { href: "/admin", label: "Admin Panel", icon: Shield };
+  const settingsIdx = items.findIndex((i) => i.href === "/settings");
+  if (settingsIdx === -1) return [...items, adminItem];
+  const next = [...items];
+  next.splice(settingsIdx, 0, adminItem);
+  return next;
 }
 
 export function getNavigationForRole(role: "owner" | "manager" | "member", opts?: NavOptions): NavigationItem[] {

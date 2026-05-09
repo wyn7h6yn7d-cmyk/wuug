@@ -13,6 +13,7 @@ import {
   type WuugUserSettings,
   parseWuugSettings,
 } from "@/lib/wuug-user-settings";
+import { canAccessAdminPanel } from "@/lib/master-admin";
 
 const SECTIONS = [
   { id: "people", label: "People & invitations" },
@@ -83,6 +84,7 @@ function inputClass(disabled?: boolean) {
 
 export function SettingsHub() {
   const { user, profile, organization, role, platformAdmin, isLoading, refreshProfile } = useAuth();
+  const showAdminNav = canAccessAdminPanel(platformAdmin, user?.email);
   const supabase = React.useMemo(() => createClient(), []);
 
   const [selected, setSelected] = React.useState<SectionId>("people");
@@ -219,12 +221,12 @@ export function SettingsHub() {
           subtitle="People, your profile, security, notifications, and workspace data."
         />
         <div className="flex flex-wrap items-center gap-2">
-          {platformAdmin ? (
+          {showAdminNav ? (
             <PressableLink href="/admin" variant="primary" size="sm">
-              Admin panel
+              Admin Panel
             </PressableLink>
           ) : null}
-          <PressableLink href="/team" variant={platformAdmin ? "secondary" : "primary"} size="sm">
+          <PressableLink href="/team" variant={showAdminNav ? "secondary" : "primary"} size="sm">
             Team & invites
           </PressableLink>
           <PressableLink href="/tasks" variant="secondary" size="sm">

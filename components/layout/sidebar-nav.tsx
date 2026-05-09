@@ -5,12 +5,15 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { BrandLogo } from "./brand-logo";
 import { getNavigationForRole } from "@/lib/navigation";
+import { canAccessAdminPanel } from "@/lib/master-admin";
 import { useAuth } from "@/components/providers/auth-provider";
 
 export function SidebarNav() {
   const pathname = usePathname();
-  const { role, platformAdmin } = useAuth();
-  const navigationItems = getNavigationForRole(role ?? "member", { platformAdmin });
+  const { role, platformAdmin, user } = useAuth();
+  const navigationItems = getNavigationForRole(role ?? "member", {
+    platformAdmin: canAccessAdminPanel(platformAdmin, user?.email),
+  });
 
   return (
     <aside

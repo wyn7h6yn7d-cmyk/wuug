@@ -7,9 +7,11 @@ import { CreateItemFlow } from "@/components/actions/create-item-flow";
 import { useAuth } from "@/components/providers/auth-provider";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
+import { canAccessAdminPanel } from "@/lib/master-admin";
 
 export function TopBar() {
   const { profile, user, organization, platformAdmin, isLoading, signOut } = useAuth();
+  const showAdminNav = canAccessAdminPanel(platformAdmin, user?.email);
   const [open, setOpen] = React.useState(false);
   const accountRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -111,14 +113,14 @@ export function TopBar() {
                 <div className="mt-1 text-xs text-fg-soft">{profile?.email ?? user?.email ?? ""}</div>
               </div>
               <div className="h-px bg-token-soft/70" />
-              {platformAdmin ? (
+              {showAdminNav ? (
                 <Link
                   href="/admin"
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-2 px-4 py-2.5 text-sm text-fg-muted hover:bg-bg2"
                 >
                   <Shield className="h-4 w-4" />
-                  Admin panel
+                  Admin Panel
                 </Link>
               ) : null}
               <Link

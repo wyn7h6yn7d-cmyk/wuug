@@ -28,7 +28,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <div className="flex items-center gap-4">
             <BrandLogo />
             <span className="rounded-full border border-amber-500/40 bg-amber-500/15 px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-300">
-              Admin
+              Admin Panel
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
