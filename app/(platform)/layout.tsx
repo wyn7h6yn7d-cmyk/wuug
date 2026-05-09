@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/layout/app-shell";
 
-export default function PlatformLayout({
+export default async function PlatformLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

@@ -1,5 +1,5 @@
-import { DashboardView } from "@/components/dashboard/dashboard-view";
+import { HomeRouter } from "@/components/platform/home-router";
 
 export default function HomePage() {
-  return <DashboardView />;
+  return <HomeRouter />;
 }
