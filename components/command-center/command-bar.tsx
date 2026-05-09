@@ -84,16 +84,8 @@ export function CommandBar({
                   placeholder={placeholder}
                   className="w-full bg-transparent text-sm text-fg placeholder:text-fg-soft focus:outline-none"
                 />
-                <span className="hidden rounded-md border border-token-soft bg-bg2/80 px-1.5 py-0.5 text-[10px] font-semibold text-fg-soft md:inline">
-                  ⌘K
-                </span>
               </>
             )}
-            {decorative ? (
-              <span className="hidden rounded-md border border-token-soft bg-bg2/80 px-1.5 py-0.5 text-[10px] font-semibold text-fg-soft md:inline">
-                ⌘K
-              </span>
-            ) : null}
           </div>
           {chips && chips.length > 0 ? (
             <div className="mt-3 flex flex-wrap gap-2">

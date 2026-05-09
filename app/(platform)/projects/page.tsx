@@ -1,12 +1,9 @@
-import { cookies } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { getPlatformSession } from "@/lib/platform-session";
 import { ProjectsPageClient, type ProjectRow, type ProjectLookup } from "@/components/projects/projects-page-client";
 import type { AppRole } from "@/lib/permissions";
 
 export default async function ProjectsPage() {
-  const supabase = createClient(await cookies());
-  const { data: userData } = await supabase.auth.getUser();
-  const user = userData.user;
+  const { supabase, user } = await getPlatformSession();
 
   if (!user) {
     return (

@@ -33,9 +33,11 @@ export function GlassCard({
         <div
           className="pointer-events-none absolute inset-0"
           style={{
+            /* Top layers = radials; bottom layer = even vertical wash so transparent zones aren’t “empty”. */
             background:
               "radial-gradient(1200px 600px at 20% -10%, rgb(var(--accent) / 0.18), transparent 55%)," +
-              "radial-gradient(900px 520px at 110% 10%, rgb(var(--accent-3) / 0.14), transparent 50%)",
+              "radial-gradient(900px 520px at 110% 10%, rgb(var(--accent-3) / 0.14), transparent 50%)," +
+              "linear-gradient(180deg, rgb(var(--surface-strong) / 0.42) 0%, rgb(var(--surface) / 0.52) 100%)",
           }}
         />
       ) : null}

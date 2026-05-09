@@ -1,6 +1,5 @@
 import { AppShell } from "@/components/layout/app-shell";
-import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
+import { getPlatformSession } from "@/lib/platform-session";
 import { redirect } from "next/navigation";
 
 export default async function PlatformLayout({
@@ -8,9 +7,8 @@ export default async function PlatformLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = createClient(await cookies());
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) redirect("/");
+  const { user } = await getPlatformSession();
+  if (!user) redirect("/");
 
   return <AppShell>{children}</AppShell>;
 }

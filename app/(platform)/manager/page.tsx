@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { ArrowRight, Clock, Radar as RadarIcon, Sparkles, Users } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getPlatformSession } from "@/lib/platform-session";
 import { CommandBar } from "@/components/command-center/command-bar";
 import { GlassCard } from "@/components/command-center/glass-card";
 import { PressableLink } from "@/components/ui/pressable-link";
@@ -19,9 +18,7 @@ const heroChips = [
 ];
 
 export default async function ManagerPage() {
-  const supabase = createClient(await cookies());
-  const { data: auth } = await supabase.auth.getUser();
-  const user = auth.user;
+  const { supabase, user } = await getPlatformSession();
 
   let openTasks = 0;
   let activePromises = 0;

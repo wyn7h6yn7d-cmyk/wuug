@@ -1,12 +1,9 @@
-import { cookies } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { getPlatformSession } from "@/lib/platform-session";
 import { ClientsPageClient } from "@/components/clients/clients-page-client";
 import type { AppRole } from "@/lib/permissions";
 
 export default async function ClientsPage() {
-  const supabase = createClient(await cookies());
-  const { data: userData } = await supabase.auth.getUser();
-  const user = userData.user;
+  const { supabase, user } = await getPlatformSession();
 
   // Platform layout already enforces auth, but keep this safe.
   if (!user) {

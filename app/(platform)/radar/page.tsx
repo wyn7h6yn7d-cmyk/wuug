@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import {
   AlertTriangle,
   ArrowRight,
@@ -9,7 +8,7 @@ import {
   Timer,
   UserRound,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getPlatformSession } from "@/lib/platform-session";
 import { CommandBar } from "@/components/command-center/command-bar";
 import { GlassCard } from "@/components/command-center/glass-card";
 import { GradientButton } from "@/components/command-center/gradient-button";
@@ -49,9 +48,7 @@ const chips = [
 ];
 
 export default async function RadarPage() {
-  const supabase = createClient(await cookies());
-  const { data: auth } = await supabase.auth.getUser();
-  const user = auth.user;
+  const { supabase, user } = await getPlatformSession();
 
   const signals: Signal[] = [];
   let stuckCount = 0;

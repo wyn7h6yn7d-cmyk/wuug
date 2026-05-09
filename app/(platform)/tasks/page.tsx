@@ -1,13 +1,10 @@
-import { cookies } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { getPlatformSession } from "@/lib/platform-session";
 import { TasksPageClient, type TaskLookups } from "@/components/tasks/tasks-page-client";
 import { fetchTaskLookups, fetchTasks } from "@/lib/tasks";
 import type { AppRole } from "@/lib/permissions";
 
 export default async function TasksPage() {
-  const supabase = createClient(await cookies());
-  const { data: userData } = await supabase.auth.getUser();
-  const user = userData.user;
+  const { supabase, user } = await getPlatformSession();
 
   const emptyLookups: TaskLookups = { clients: [], projects: [], profiles: [] };
 

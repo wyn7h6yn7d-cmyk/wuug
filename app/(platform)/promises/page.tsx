@@ -1,13 +1,10 @@
-import { cookies } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { getPlatformSession } from "@/lib/platform-session";
 import { PromisesPageClient, type PromiseLookups } from "@/components/promises/promises-page-client";
 import { fetchPromiseLookups, fetchPromises } from "@/lib/promises";
 import type { AppRole } from "@/lib/permissions";
 
 export default async function PromisesPage() {
-  const supabase = createClient(await cookies());
-  const { data: userData } = await supabase.auth.getUser();
-  const user = userData.user;
+  const { supabase, user } = await getPlatformSession();
 
   const emptyLookups: PromiseLookups = { clients: [], projects: [], profiles: [] };
 

@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { BrandLogo } from "./brand-logo";
 import { getNavigationForRole } from "@/lib/navigation";
 import { useAuth } from "@/components/providers/auth-provider";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function MobileNav() {
   const pathname = usePathname();
@@ -15,9 +14,8 @@ export function MobileNav() {
 
   return (
     <div className="mb-4 rounded-[24px] glass p-3 lg:hidden">
-      <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="mb-3 flex items-center gap-3">
         <BrandLogo />
-        <ThemeToggle size="sm" />
       </div>
       <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
         {navigationItems.map((item) => {
@@ -26,6 +24,7 @@ export function MobileNav() {
             <Link
               key={item.href}
               href={item.href}
+              prefetch
               className={cn(
                 "whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold transition",
                 isActive

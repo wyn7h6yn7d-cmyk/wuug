@@ -1,6 +1,5 @@
-import { cookies } from "next/headers";
 import { ArrowRight, Clock } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getPlatformSession } from "@/lib/platform-session";
 import { CommandBar } from "@/components/command-center/command-bar";
 import { GlassCard } from "@/components/command-center/glass-card";
 import { PressableLink } from "@/components/ui/pressable-link";
@@ -17,9 +16,7 @@ const chips = [
 ];
 
 export default async function MyDayPage() {
-  const supabase = createClient(await cookies());
-  const { data: auth } = await supabase.auth.getUser();
-  const user = auth.user;
+  const { supabase, user } = await getPlatformSession();
 
   type Item = { id: string; title: string; status: string | null; due_at: string | null };
   let tasks: Item[] = [];

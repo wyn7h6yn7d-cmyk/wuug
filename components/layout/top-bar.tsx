@@ -44,9 +44,6 @@ export function TopBar() {
           placeholder="Ask Wuug or search…"
           className="w-full bg-transparent text-sm text-fg placeholder:text-fg-soft focus:outline-none"
         />
-        <span className="hidden rounded-md border border-token-soft bg-bg2/80 px-1.5 py-0.5 text-[10px] font-semibold text-fg-soft md:inline">
-          ⌘K
-        </span>
       </label>
 
       <div className="flex items-center gap-2 sm:gap-3">
@@ -59,7 +56,7 @@ export function TopBar() {
           <Bell className="h-5 w-5" />
         </button>
 
-        <ThemeToggle className="hidden md:inline-flex" size="sm" />
+        <ThemeToggle className="inline-flex" size="sm" />
 
         <Link
           href="/settings"

@@ -1,13 +1,10 @@
-import { cookies } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { getPlatformSession } from "@/lib/platform-session";
 import { AccessRestricted } from "@/components/access/access-restricted";
 import { TeamPageClient } from "@/components/team/team-page-client";
 import type { AppRole } from "@/lib/permissions";
 
 export default async function TeamPage() {
-  const supabase = createClient(await cookies());
-  const { data: userData } = await supabase.auth.getUser();
-  const user = userData.user;
+  const { supabase, user } = await getPlatformSession();
   if (!user) return <AccessRestricted backHref="/login" />;
 
   const { data: profile } = await supabase

@@ -284,7 +284,9 @@ export function ClientsPageClient({
                 </button>
               </>
             ) : (
-              <div className="text-sm text-slate-700">Select a client to see details.</div>
+              <div className="flex min-h-[180px] items-center justify-center rounded-2xl border border-token-soft bg-surface/75 px-4 py-8 text-center text-sm text-fg-soft">
+                Select a client to see details.
+              </div>
             )}
           </GlassCard>
         </FadeIn>

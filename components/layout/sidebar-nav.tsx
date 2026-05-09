@@ -2,12 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { BrandLogo } from "./brand-logo";
 import { getNavigationForRole } from "@/lib/navigation";
 import { useAuth } from "@/components/providers/auth-provider";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function SidebarNav() {
   const pathname = usePathname();
@@ -34,18 +32,14 @@ export function SidebarNav() {
             <Link
               key={item.href}
               href={item.href}
+              prefetch
               className={cn(
-                "group relative flex items-center gap-3 rounded-[20px] px-3 py-2.5 text-sm font-semibold transition",
-                isActive ? "text-fg" : "text-fg-soft hover:text-fg",
+                "group relative flex items-center gap-3 rounded-[20px] px-3 py-2.5 text-sm font-semibold transition-colors duration-150",
+                isActive
+                  ? "border border-token-soft bg-[rgb(var(--accent)/0.08)] text-fg shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] dark:bg-[rgb(var(--accent)/0.18)]"
+                  : "border border-transparent text-fg-soft hover:text-fg",
               )}
             >
-              {isActive ? (
-                <motion.span
-                  layoutId="sidebar-pill"
-                  className="absolute inset-0 rounded-[20px] border border-token-soft bg-[rgb(var(--accent)/0.08)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] dark:bg-[rgb(var(--accent)/0.18)]"
-                  transition={{ type: "spring", stiffness: 320, damping: 28 }}
-                />
-              ) : null}
               <span
                 className={cn(
                   "relative inline-flex h-9 w-9 items-center justify-center rounded-2xl border",
@@ -64,11 +58,6 @@ export function SidebarNav() {
           );
         })}
       </nav>
-
-      <div className="mt-4 flex items-center justify-between gap-2 rounded-[20px] border border-token-soft bg-surface/60 px-3 py-2">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-soft">Theme</span>
-        <ThemeToggle size="sm" />
-      </div>
     </aside>
   );
 }
