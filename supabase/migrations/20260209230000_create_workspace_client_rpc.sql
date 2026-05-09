@@ -93,6 +93,7 @@ begin
 end;
 $$;
 
+-- 9× text (name … next_step), then due_at, then owner_id — not 10× text.
 grant execute on function public.create_workspace_client(
-  text, text, text, text, text, text, text, text, text, text, timestamptz, uuid
+  text, text, text, text, text, text, text, text, text, timestamptz, uuid
 ) to authenticated;

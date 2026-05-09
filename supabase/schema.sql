@@ -555,7 +555,7 @@ end;
 $$;
 
 grant execute on function public.create_workspace_client(
-  text, text, text, text, text, text, text, text, text, text, timestamptz, uuid
+  text, text, text, text, text, text, text, text, text, timestamptz, uuid
 ) to authenticated;
 
 -- ============================================================================
