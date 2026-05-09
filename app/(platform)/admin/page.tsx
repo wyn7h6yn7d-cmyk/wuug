@@ -36,6 +36,8 @@ export default async function AdminPage() {
 
   return (
     <AdminPanel
+      signedInUserId={user.id}
+      signedInEmail={user.email ?? ""}
       profiles={(profilesRes.data ?? []) as AdminProfileRow[]}
       organizations={(orgsRes.data ?? []) as AdminOrgRow[]}
       invitations={(invitesRes.data ?? []) as AdminInviteRow[]}

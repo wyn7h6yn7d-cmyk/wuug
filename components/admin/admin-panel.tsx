@@ -61,17 +61,27 @@ function toLocalInput(iso: string | null | undefined) {
 }
 
 export function AdminPanel({
+  signedInUserId,
+  signedInEmail,
   profiles,
   organizations,
   invitations,
   loadError,
 }: {
+  signedInUserId: string;
+  signedInEmail: string;
   profiles: AdminProfileRow[];
   organizations: AdminOrgRow[];
   invitations: AdminInviteRow[];
   loadError: string | null;
 }) {
   const [tab, setTab] = React.useState<Tab>("users");
+
+  const profilesOrdered = React.useMemo(() => {
+    const mine = profiles.filter((p) => p.id === signedInUserId);
+    const rest = profiles.filter((p) => p.id !== signedInUserId);
+    return [...mine, ...rest];
+  }, [profiles, signedInUserId]);
 
   async function runAction(fn: (fd: FormData) => Promise<void>, fd: FormData) {
     try {
@@ -88,6 +98,17 @@ export function AdminPanel({
         title="Platform admin"
         subtitle="Users, billing, subscriptions, and access. The master account (kennethalto95@gmail.com) is always owner and platform admin and cannot be demoted, stripped of admin, or banned. Other admins cannot change that."
       />
+
+      <GlassCard className="flex flex-col gap-1 border border-[rgb(var(--accent)/0.25)] bg-[rgb(var(--accent)/0.08)] p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-fg-muted">Your session</p>
+          <p className="mt-1 text-sm font-medium text-fg">{signedInEmail || "—"}</p>
+        </div>
+        <p className="text-xs text-fg-soft">
+          This is the account you are signed in with. Your row is listed first on the Users tab when it appears in the
+          directory.
+        </p>
+      </GlassCard>
 
       {loadError ? (
         <GlassCard className="border border-orange-500/40 bg-orange-500/10 p-4">
@@ -140,12 +161,23 @@ export function AdminPanel({
               </tr>
             </thead>
             <tbody>
-              {profiles.map((p) => {
+              {profilesOrdered.map((p) => {
                 const master = isMasterAdminEmail(p.email);
+                const isYou = p.id === signedInUserId;
                 return (
-                  <tr key={p.id} className="align-top">
+                  <tr
+                    key={p.id}
+                    className={`align-top ${isYou ? "bg-[rgb(var(--accent)/0.06)] ring-1 ring-[rgb(var(--accent)/0.2)] ring-inset" : ""}`}
+                  >
                     <td className="border-b border-token-soft/60 py-3 pr-3">
-                      <div className="font-semibold text-fg">{p.full_name}</div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="font-semibold text-fg">{p.full_name}</div>
+                        {isYou ? (
+                          <span className="rounded-md bg-[rgb(var(--accent)/0.2)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-fg">
+                            You
+                          </span>
+                        ) : null}
+                      </div>
                       <div className="text-xs text-fg-soft">{p.email}</div>
                       <div className="mt-1 text-xs text-fg-muted">
                         Role: <span className="font-medium text-fg">{p.role}</span>
