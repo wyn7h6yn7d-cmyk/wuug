@@ -5,7 +5,9 @@ import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BrandLogo } from "@/components/layout/brand-logo";
-import { SurfaceCard } from "@/components/ui/surface-card";
+import { OrbBackground } from "@/components/command-center/orb-background";
+import { GlassCard } from "@/components/command-center/glass-card";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { createClient } from "@/lib/supabase/client";
 
 type InviteInfo = {
@@ -21,15 +23,17 @@ export default function RegisterPage() {
   return (
     <React.Suspense
       fallback={
-        <div className="min-h-screen bg-[#F7FAFF] p-4 sm:p-8">
-          <div className="mx-auto max-w-md">
-            <div className="mb-6 flex justify-center">
+        <div className="relative min-h-screen overflow-hidden bg-app text-fg">
+          <OrbBackground />
+          <div className="relative mx-auto flex min-h-screen max-w-md flex-col px-4 py-6 sm:py-10">
+            <div className="mb-6 flex items-center justify-between">
               <BrandLogo />
+              <ThemeToggle size="sm" />
             </div>
-            <SurfaceCard className="p-6 sm:p-8">
-              <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Register</h1>
-              <p className="mt-2 text-sm text-slate-500">Loading…</p>
-            </SurfaceCard>
+            <GlassCard className="p-6 sm:p-8">
+              <h1 className="text-2xl font-semibold tracking-tight text-fg">Register</h1>
+              <p className="mt-2 text-sm text-fg-soft">Loading…</p>
+            </GlassCard>
           </div>
         </div>
       }
@@ -86,15 +90,17 @@ function RegisterPageInner() {
     : "Create your workspace and start in minutes.";
 
   return (
-    <div className="min-h-screen bg-[#F7FAFF] p-4 sm:p-8">
-      <div className="mx-auto max-w-md">
-        <div className="mb-6 flex justify-center">
+    <div className="relative min-h-screen overflow-hidden bg-app text-fg">
+      <OrbBackground />
+      <div className="relative mx-auto flex min-h-screen max-w-md flex-col px-4 py-6 sm:py-10">
+        <div className="mb-6 flex items-center justify-between">
           <BrandLogo />
+          <ThemeToggle size="sm" />
         </div>
 
-        <SurfaceCard className="p-6 sm:p-8">
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Register</h1>
-          <p className="mt-2 text-sm text-slate-500">{subtitle}</p>
+        <GlassCard className="p-6 sm:p-8">
+          <h1 className="text-2xl font-semibold tracking-tight text-fg">Register</h1>
+          <p className="mt-2 text-sm text-fg-soft">{subtitle}</p>
 
           {inviteToken ? (
             <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
@@ -249,13 +255,13 @@ function RegisterPageInner() {
             </button>
           </form>
 
-          <p className="mt-4 text-sm text-slate-600">
+          <p className="mt-4 text-sm text-fg-muted">
             Already have an account?{" "}
-            <Link href="/login" className="font-semibold text-blue-700 hover:underline">
+            <Link href="/login" className="font-semibold text-[rgb(var(--accent))] hover:underline">
               Log in
             </Link>
           </p>
-        </SurfaceCard>
+        </GlassCard>
       </div>
     </div>
   );

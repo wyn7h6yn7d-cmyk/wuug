@@ -50,7 +50,7 @@ export function Toaster() {
         <div
           key={item.id}
           className={cn(
-            "pointer-events-auto max-w-[360px] rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm font-semibold text-slate-900 shadow-[0_18px_50px_rgba(15,23,42,0.18)] backdrop-blur",
+            "pointer-events-auto max-w-[360px] rounded-2xl border border-token-soft bg-surface/90 px-4 py-3 text-sm font-semibold text-fg shadow-[0_18px_50px_rgba(15,23,42,0.18)] backdrop-blur dark:bg-surface/80 dark:shadow-[0_24px_60px_rgba(0,0,0,0.55)]",
           )}
           role="status"
           aria-live="polite"

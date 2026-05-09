@@ -85,11 +85,11 @@ export function RadarCommandCenterView() {
               <RadarVisual
                 className="mx-auto max-w-[240px]"
                 blips={[
-                  { id: "a", x: 0.22, y: 0.38, tone: "orange" },
-                  { id: "b", x: 0.62, y: 0.26, tone: "violet" },
-                  { id: "c", x: 0.42, y: 0.66, tone: "blue" },
-                  { id: "d", x: 0.78, y: 0.64, tone: "orange" },
-                  { id: "e", x: 0.52, y: 0.46, tone: "neutral" },
+                  { id: "a", angle: 200, distance: 0.7, tone: "orange" },
+                  { id: "b", angle: 50, distance: 0.6, tone: "violet" },
+                  { id: "c", angle: 130, distance: 0.45, tone: "blue" },
+                  { id: "d", angle: 320, distance: 0.75, tone: "orange" },
+                  { id: "e", angle: 250, distance: 0.3, tone: "neutral" },
                 ]}
               />
               <div className="space-y-3">

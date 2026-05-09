@@ -7,14 +7,14 @@ type GradientButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantStyles: Record<NonNullable<GradientButtonProps["variant"]>, string> = {
   primary:
-    "text-white shadow-[0_18px_40px_rgba(99,102,241,0.28)] bg-[linear-gradient(90deg,rgba(99,102,241,1)_0%,rgba(168,85,247,1)_45%,rgba(20,184,166,1)_100%)] hover:opacity-95",
+    "text-white shadow-[0_18px_40px_rgba(99,102,241,0.32)] gradient-sheen hover:opacity-95",
   secondary:
-    "text-slate-800 bg-white/70 border border-white/70 shadow-[0_14px_34px_rgba(15,23,42,0.10)] hover:bg-white/85",
-  ghost: "text-slate-700 hover:bg-white/55 border border-transparent",
+    "text-fg bg-surface/80 dark:bg-surface/70 border border-token-soft shadow-[0_14px_34px_rgba(15,23,42,0.08)] hover:bg-surface dark:shadow-[0_14px_34px_rgba(0,0,0,0.45)]",
+  ghost: "text-fg-muted hover:bg-surface/70 border border-transparent",
 };
 
 const sizeStyles: Record<NonNullable<GradientButtonProps["size"]>, string> = {
-  sm: "h-10 rounded-2xl px-3 text-sm",
+  sm: "h-9 rounded-2xl px-3 text-sm",
   md: "h-11 rounded-[22px] px-4 text-sm",
 };
 
@@ -38,4 +38,3 @@ export function GradientButton({
     />
   );
 }
-

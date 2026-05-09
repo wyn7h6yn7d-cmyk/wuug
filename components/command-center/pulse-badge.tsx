@@ -5,44 +5,47 @@ import { cn } from "@/lib/utils";
 
 type PulseBadgeProps = {
   label: string;
-  tone?: "calm" | "warn" | "risk" | "neutral";
+  tone?: "calm" | "warn" | "risk" | "neutral" | "accent";
   className?: string;
 };
 
 const toneStyles: Record<NonNullable<PulseBadgeProps["tone"]>, string> = {
-  calm: "border-emerald-200/70 bg-emerald-50/70 text-emerald-800",
-  warn: "border-amber-200/70 bg-amber-50/70 text-amber-900",
-  risk: "border-rose-200/70 bg-rose-50/70 text-rose-900",
-  neutral: "border-slate-200/70 bg-white/55 text-slate-700",
+  calm: "border-[rgb(var(--healthy)/0.35)] bg-[rgb(var(--healthy)/0.08)] text-[rgb(var(--healthy))]",
+  warn: "border-[rgb(var(--warn)/0.35)] bg-[rgb(var(--warn)/0.08)] text-[rgb(var(--warn))]",
+  risk: "border-[rgb(var(--risk)/0.35)] bg-[rgb(var(--risk)/0.08)] text-[rgb(var(--risk))]",
+  neutral:
+    "border-token-soft bg-surface/70 text-fg-muted",
+  accent:
+    "border-[rgb(var(--accent)/0.35)] bg-[rgb(var(--accent)/0.10)] text-[rgb(var(--accent))]",
 };
 
 const dotStyles: Record<NonNullable<PulseBadgeProps["tone"]>, string> = {
-  calm: "bg-emerald-500",
-  warn: "bg-amber-500",
-  risk: "bg-rose-500",
-  neutral: "bg-slate-500",
+  calm: "bg-[rgb(var(--healthy))]",
+  warn: "bg-[rgb(var(--warn))]",
+  risk: "bg-[rgb(var(--risk))]",
+  neutral: "bg-fg-soft",
+  accent: "bg-[rgb(var(--accent))]",
 };
 
 export function PulseBadge({ label, tone = "neutral", className }: PulseBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold shadow-sm ring-1 ring-slate-900/[0.03]",
+        "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold backdrop-blur",
         toneStyles[tone],
         className,
       )}
     >
-      <span className={cn("relative flex h-2 w-2", dotStyles[tone])}>
+      <span className="relative flex h-2 w-2">
         <motion.span
-          className={cn("absolute inset-0 rounded-full", dotStyles[tone])}
+          className={cn("absolute inset-0 rounded-full opacity-30", dotStyles[tone])}
           initial={{ opacity: 0.25, scale: 1 }}
-          animate={{ opacity: [0.12, 0.22, 0.12], scale: [1, 1.9, 1] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ opacity: [0.12, 0.28, 0.12], scale: [1, 2.1, 1] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
         />
-        <span className="relative block h-2 w-2 rounded-full bg-current" />
+        <span className={cn("relative block h-2 w-2 rounded-full", dotStyles[tone])} />
       </span>
       {label}
     </span>
   );
 }
-

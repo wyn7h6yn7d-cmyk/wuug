@@ -1,20 +1,145 @@
 @import "tailwindcss";
 
+/* Class-based dark mode for Tailwind v4 */
+@variant dark (&:where(.theme-dark, .theme-dark *));
+
+/* ────────────────────────────────────────────────────────────────
+   wuug design tokens — futuristic command-center system
+   Light = airy ice. Dark = cinematic deep space.
+   ────────────────────────────────────────────────────────────── */
+
 :root {
-  --background: #f7faff;
-  --foreground: #0f172a;
+  color-scheme: light;
+
+  /* Surfaces */
+  --bg: 245 250 255;
+  --bg-2: 240 246 255;
+  --surface: 255 255 255;
+  --surface-soft: 250 252 255;
+  --surface-strong: 255 255 255;
+  --surface-glass: 255 255 255;
+
+  /* Borders / dividers */
+  --border: 229 234 243;
+  --border-soft: 234 240 250;
+  --ring: 99 102 241;
+
+  /* Text */
+  --fg: 15 23 42;
+  --fg-muted: 71 85 105;
+  --fg-soft: 100 116 139;
+
+  /* Accents */
+  --accent: 99 102 241;
+  --accent-2: 168 85 247;
+  --accent-3: 20 184 166;
+  --accent-glow: 99 102 241;
+
+  /* Semantic */
+  --healthy: 16 185 129;
+  --warn: 234 88 12;
+  --risk: 244 63 94;
+
+  /* Background orb intensities */
+  --orb-1: rgba(99, 102, 241, 0.22);
+  --orb-2: rgba(20, 184, 166, 0.20);
+  --orb-3: rgba(168, 85, 247, 0.18);
+  --orb-veil: radial-gradient(1200px 600px at 10% 0%, rgba(255,255,255,0.55), transparent 55%);
+
+  /* Glass */
+  --glass-tint: rgba(255, 255, 255, 0.55);
+  --glass-tint-strong: rgba(255, 255, 255, 0.78);
+  --glass-stroke: rgba(255, 255, 255, 0.7);
+  --glass-shadow: 0 22px 60px rgba(15, 23, 42, 0.10);
+
+  /* Type */
+  --background: rgb(var(--bg));
+  --foreground: rgb(var(--fg));
+}
+
+.theme-dark {
+  color-scheme: dark;
+
+  --bg: 7 11 22;
+  --bg-2: 11 16 32;
+  --surface: 17 22 38;
+  --surface-soft: 21 27 46;
+  --surface-strong: 26 33 56;
+  --surface-glass: 22 28 48;
+
+  --border: 38 47 76;
+  --border-soft: 32 41 68;
+  --ring: 138 148 255;
+
+  --fg: 235 240 255;
+  --fg-muted: 178 188 214;
+  --fg-soft: 138 150 178;
+
+  --accent: 138 148 255;
+  --accent-2: 196 145 255;
+  --accent-3: 84 220 198;
+  --accent-glow: 124 130 255;
+
+  --healthy: 67 217 168;
+  --warn: 251 146 60;
+  --risk: 248 113 113;
+
+  --orb-1: rgba(99, 102, 241, 0.42);
+  --orb-2: rgba(20, 184, 166, 0.28);
+  --orb-3: rgba(168, 85, 247, 0.36);
+  --orb-veil: radial-gradient(1200px 600px at 10% 0%, rgba(124, 130, 255, 0.10), transparent 55%);
+
+  --glass-tint: rgba(22, 28, 48, 0.55);
+  --glass-tint-strong: rgba(22, 28, 48, 0.78);
+  --glass-stroke: rgba(255, 255, 255, 0.10);
+  --glass-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+
+  --background: rgb(var(--bg));
+  --foreground: rgb(var(--fg));
 }
 
 @theme inline {
+  --color-bg: rgb(var(--bg));
+  --color-bg2: rgb(var(--bg-2));
+  --color-surface: rgb(var(--surface));
+  --color-surface-soft: rgb(var(--surface-soft));
+  --color-surface-strong: rgb(var(--surface-strong));
+  --color-border: rgb(var(--border));
+  --color-border-soft: rgb(var(--border-soft));
+  --color-ring: rgb(var(--ring));
+  --color-fg: rgb(var(--fg));
+  --color-fg-muted: rgb(var(--fg-muted));
+  --color-fg-soft: rgb(var(--fg-soft));
+  --color-accent: rgb(var(--accent));
+  --color-accent-2: rgb(var(--accent-2));
+  --color-accent-3: rgb(var(--accent-3));
+  --color-healthy: rgb(var(--healthy));
+  --color-warn: rgb(var(--warn));
+  --color-risk: rgb(var(--risk));
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
 }
 
-body {
+html {
   background: var(--background);
   color: var(--foreground);
+}
+
+body {
+  background:
+    radial-gradient(1200px 700px at 12% -10%, rgb(var(--accent) / 0.10), transparent 60%),
+    radial-gradient(1100px 720px at 100% 10%, rgb(var(--accent-3) / 0.10), transparent 55%),
+    radial-gradient(900px 560px at 60% 110%, rgb(var(--accent-2) / 0.10), transparent 55%),
+    var(--background);
+  color: var(--foreground);
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
 button,
@@ -22,7 +147,8 @@ input,
 select,
 textarea,
 a {
-  transition: all 160ms ease;
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease,
+    box-shadow 200ms ease, transform 200ms ease, opacity 160ms ease;
 }
 
 button:focus-visible,
@@ -30,8 +156,13 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 a:focus-visible {
-  outline: 2px solid #7c8cff;
+  outline: 2px solid rgb(var(--ring) / 0.85);
   outline-offset: 2px;
+}
+
+::selection {
+  background: rgb(var(--accent) / 0.32);
+  color: rgb(var(--fg));
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -41,3 +172,189 @@ a:focus-visible {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ────────────────────────────────────────────────────────────────
+   Reusable surface utilities
+   ────────────────────────────────────────────────────────────── */
+
+.glass {
+  background: var(--glass-tint);
+  border: 1px solid var(--glass-stroke);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+.glass-strong {
+  background: var(--glass-tint-strong);
+  border: 1px solid var(--glass-stroke);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+}
+
+.text-fg { color: rgb(var(--fg)); }
+.text-fg-muted { color: rgb(var(--fg-muted)); }
+.text-fg-soft { color: rgb(var(--fg-soft)); }
+
+.bg-app { background: var(--background); }
+.bg-surface { background: rgb(var(--surface)); }
+.bg-surface-soft { background: rgb(var(--surface-soft)); }
+.bg-surface-strong { background: rgb(var(--surface-strong)); }
+
+.border-token { border-color: rgb(var(--border)); }
+.border-token-soft { border-color: rgb(var(--border-soft)); }
+
+.ring-soft { box-shadow: 0 0 0 1px rgb(var(--border)); }
+
+/* Pulse rings used in Radar / AI signals */
+@keyframes wuug-pulse {
+  0% { transform: scale(0.8); opacity: 0.55; }
+  70% { transform: scale(2); opacity: 0; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.pulse-ring::before,
+.pulse-ring::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1px solid rgb(var(--accent) / 0.45);
+  animation: wuug-pulse 2.6s ease-out infinite;
+  pointer-events: none;
+}
+.pulse-ring::after {
+  animation-delay: 1.3s;
+}
+
+/* Animated gradient sheen */
+@keyframes wuug-sheen {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.gradient-sheen {
+  background: linear-gradient(
+    120deg,
+    rgb(var(--accent)) 0%,
+    rgb(var(--accent-2)) 45%,
+    rgb(var(--accent-3)) 100%
+  );
+  background-size: 200% 200%;
+  animation: wuug-sheen 9s ease infinite;
+}
+
+/* Slow orbit motion utility */
+@keyframes wuug-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.orbit { animation: wuug-orbit 28s linear infinite; }
+.orbit-slow { animation: wuug-orbit 50s linear infinite; }
+.orbit-reverse { animation: wuug-orbit 36s linear infinite reverse; }
+
+/* Soft scanline glow for radar */
+@keyframes wuug-scan {
+  0% { transform: rotate(0deg); opacity: 0.55; }
+  100% { transform: rotate(360deg); opacity: 0.55; }
+}
+.scan-line {
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(from 0deg, rgb(var(--accent) / 0.0) 0deg, rgb(var(--accent) / 0.35) 60deg, transparent 70deg);
+  border-radius: 9999px;
+  animation: wuug-scan 6s linear infinite;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* Hover lift used by tactile cards */
+.tactile {
+  transition: transform 220ms cubic-bezier(.2,.7,.3,1), box-shadow 220ms ease, background-color 220ms ease;
+}
+.tactile:hover {
+  transform: translateY(-2px);
+}
+
+/* ────────────────────────────────────────────────────────────────
+   Dark-mode "bridge" — remap common Tailwind utility colors that
+   appear all over the legacy CRUD pages so dark mode works without
+   refactoring every file. Light mode keeps Tailwind defaults.
+   ────────────────────────────────────────────────────────────── */
+
+.theme-dark .bg-white,
+.theme-dark .bg-white\/95 { background-color: rgb(var(--surface)) !important; }
+.theme-dark .bg-white\/90 { background-color: rgb(var(--surface) / 0.92) !important; }
+.theme-dark .bg-white\/80,
+.theme-dark .bg-white\/85 { background-color: rgb(var(--surface) / 0.85) !important; }
+.theme-dark .bg-white\/70,
+.theme-dark .bg-white\/75 { background-color: rgb(var(--surface) / 0.70) !important; }
+.theme-dark .bg-white\/55,
+.theme-dark .bg-white\/60,
+.theme-dark .bg-white\/45 { background-color: rgb(var(--surface) / 0.55) !important; }
+
+.theme-dark .bg-slate-50 { background-color: rgb(var(--bg-2)) !important; }
+.theme-dark .bg-slate-100 { background-color: rgb(var(--surface-soft)) !important; }
+.theme-dark .bg-slate-50\/80 { background-color: rgb(var(--bg-2) / 0.8) !important; }
+
+.theme-dark .border-white\/60,
+.theme-dark .border-white\/70,
+.theme-dark .border-white\/55 { border-color: rgb(var(--border)) !important; }
+.theme-dark .border-slate-200,
+.theme-dark .border-slate-300 { border-color: rgb(var(--border)) !important; }
+.theme-dark .border-\[\#E5EAF3\] { border-color: rgb(var(--border)) !important; }
+
+.theme-dark .text-slate-900,
+.theme-dark .text-slate-950 { color: rgb(var(--fg)) !important; }
+.theme-dark .text-slate-800 { color: rgb(var(--fg)) !important; }
+.theme-dark .text-slate-700 { color: rgb(var(--fg-muted)) !important; }
+.theme-dark .text-slate-600 { color: rgb(var(--fg-muted)) !important; }
+.theme-dark .text-slate-500 { color: rgb(var(--fg-soft)) !important; }
+.theme-dark .text-slate-400 { color: rgb(var(--fg-soft)) !important; }
+.theme-dark .placeholder\:text-slate-400::placeholder,
+.theme-dark .placeholder\:text-slate-500::placeholder { color: rgb(var(--fg-soft)) !important; }
+
+.theme-dark .ring-slate-900\/\[0\.03\],
+.theme-dark .ring-slate-900\/\[0\.04\] { --tw-ring-color: rgb(255 255 255 / 0.05) !important; }
+
+.theme-dark .shadow-sm,
+.theme-dark .shadow-\[0_8px_30px_rgba\(66\,86\,122\,0\.08\)\],
+.theme-dark .shadow-\[0_18px_44px_rgba\(66\,86\,122\,0\.18\)\] {
+  box-shadow: 0 12px 40px rgba(0,0,0,0.45) !important;
+}
+
+/* Hover surface bumps */
+.theme-dark .hover\:bg-white\/70:hover,
+.theme-dark .hover\:bg-white\/75:hover,
+.theme-dark .hover\:bg-white\/85:hover,
+.theme-dark .hover\:bg-slate-50:hover { background-color: rgb(var(--surface) / 0.92) !important; }
+.theme-dark .hover\:bg-slate-100:hover { background-color: rgb(var(--surface) / 0.85) !important; }
+
+/* Inputs/selects in modals look correct in dark */
+.theme-dark input,
+.theme-dark select,
+.theme-dark textarea {
+  color: rgb(var(--fg));
+  caret-color: rgb(var(--fg));
+}
+
+/* Soft accent backgrounds occasionally hardcoded as emerald/amber/rose 50 — keep tinted but darker */
+.theme-dark .bg-emerald-50 { background-color: rgb(16 185 129 / 0.12) !important; }
+.theme-dark .text-emerald-700,
+.theme-dark .text-emerald-800 { color: rgb(67 217 168) !important; }
+.theme-dark .border-emerald-200 { border-color: rgb(16 185 129 / 0.4) !important; }
+
+.theme-dark .bg-rose-50 { background-color: rgb(248 113 113 / 0.12) !important; }
+.theme-dark .text-rose-700,
+.theme-dark .text-rose-800 { color: rgb(248 113 113) !important; }
+.theme-dark .border-rose-200 { border-color: rgb(248 113 113 / 0.4) !important; }
+
+.theme-dark .bg-amber-50 { background-color: rgb(251 146 60 / 0.12) !important; }
+.theme-dark .text-amber-800,
+.theme-dark .text-amber-900 { color: rgb(251 146 60) !important; }
+.theme-dark .border-amber-200 { border-color: rgb(251 146 60 / 0.4) !important; }
+
+.theme-dark .text-blue-700 { color: rgb(138 148 255) !important; }
+
+/* Modal scrim already adaptive, but make slate-900/30 deeper in dark */
+.theme-dark .bg-slate-900\/30 { background-color: rgb(0 0 0 / 0.55) !important; }

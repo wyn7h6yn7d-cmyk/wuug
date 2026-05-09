@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { BrandLogo } from "./brand-logo";
 import { getNavigationForRole } from "@/lib/navigation";
 import { useAuth } from "@/components/providers/auth-provider";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function MobileNav() {
   const pathname = usePathname();
@@ -13,9 +14,10 @@ export function MobileNav() {
   const navigationItems = getNavigationForRole(role ?? "member");
 
   return (
-    <div className="mb-4 rounded-[24px] border border-white/60 bg-white/55 p-3 shadow-[0_12px_34px_rgba(66,86,122,0.10)] backdrop-blur lg:hidden">
-      <div className="mb-3">
+    <div className="mb-4 rounded-[24px] glass p-3 lg:hidden">
+      <div className="mb-3 flex items-center justify-between gap-3">
         <BrandLogo />
+        <ThemeToggle size="sm" />
       </div>
       <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
         {navigationItems.map((item) => {
@@ -25,10 +27,10 @@ export function MobileNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-semibold",
+                "whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold transition",
                 isActive
-                  ? "bg-gradient-to-r from-blue-500 via-violet-500 to-teal-400 text-white"
-                  : "bg-slate-50 text-slate-600",
+                  ? "gradient-sheen text-white shadow-[0_10px_28px_rgba(99,102,241,0.35)]"
+                  : "border border-token-soft bg-surface/60 text-fg-muted",
               )}
             >
               {item.label}

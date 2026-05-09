@@ -147,10 +147,10 @@ export function TodaysPulseView() {
                   <RadarVisual
                     className="mx-auto max-w-[220px]"
                     blips={[
-                      { id: "a", x: 0.25, y: 0.35, tone: "orange" },
-                      { id: "b", x: 0.62, y: 0.28, tone: "violet" },
-                      { id: "c", x: 0.42, y: 0.64, tone: "blue" },
-                      { id: "d", x: 0.75, y: 0.62, tone: "orange" },
+                      { id: "a", angle: 200, distance: 0.6, tone: "orange" },
+                      { id: "b", angle: 50, distance: 0.55, tone: "violet" },
+                      { id: "c", angle: 130, distance: 0.4, tone: "blue" },
+                      { id: "d", angle: 320, distance: 0.7, tone: "orange" },
                     ]}
                   />
                   <div className="space-y-2">

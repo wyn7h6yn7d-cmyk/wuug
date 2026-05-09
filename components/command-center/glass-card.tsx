@@ -3,23 +3,32 @@ import { cn } from "@/lib/utils";
 type GlassCardProps = {
   children: React.ReactNode;
   className?: string;
-  as?: "section" | "div" | "article";
+  as?: "section" | "div" | "article" | "aside";
+  glow?: boolean;
 };
 
-export function GlassCard({ children, className, as = "section" }: GlassCardProps) {
+export function GlassCard({ children, className, as = "section", glow = true }: GlassCardProps) {
   const Component = as;
 
   return (
     <Component
       className={cn(
-        "relative overflow-hidden rounded-[28px] border border-white/60 bg-white/55 shadow-[0_20px_60px_rgba(15,23,42,0.10)] backdrop-blur-xl",
-        "ring-1 ring-slate-900/[0.04]",
+        "relative overflow-hidden rounded-[28px] glass",
+        "ring-1 ring-black/[0.04] dark:ring-white/[0.06]",
         className,
       )}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(1200px_600px_at_20%_-10%,rgba(99,102,241,0.12),transparent_55%),radial-gradient(900px_520px_at_110%_10%,rgba(20,184,166,0.10),transparent_50%)]" />
+      {glow ? (
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(1200px 600px at 20% -10%, rgb(var(--accent) / 0.18), transparent 55%)," +
+              "radial-gradient(900px 520px at 110% 10%, rgb(var(--accent-3) / 0.14), transparent 50%)",
+          }}
+        />
+      ) : null}
       <div className="relative">{children}</div>
     </Component>
   );
 }
-

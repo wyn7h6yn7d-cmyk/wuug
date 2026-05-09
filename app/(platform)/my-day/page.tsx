@@ -1,10 +1,21 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { ArrowRight, Clock, Handshake, ListTodo, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { PageHeader } from "@/components/ui/page-header";
-import { SurfaceCard } from "@/components/ui/surface-card";
+import { CommandBar } from "@/components/command-center/command-bar";
+import { GlassCard } from "@/components/command-center/glass-card";
 import { GradientButton } from "@/components/command-center/gradient-button";
-import { ArrowRight } from "lucide-react";
+import { InsightCard } from "@/components/command-center/insight-card";
+import { NextBestAction } from "@/components/command-center/next-best-action";
+import { PageHeader } from "@/components/ui/page-header";
+import { PulseBadge } from "@/components/command-center/pulse-badge";
+
+const chips = [
+  { key: "plan", label: "Plan my day" },
+  { key: "next", label: "What should I do next?" },
+  { key: "draft", label: "Draft a follow-up" },
+  { key: "blocked", label: "Where am I blocked?" },
+];
 
 export default function MyDayPage() {
   return <MyDayServer />;
@@ -15,114 +26,185 @@ async function MyDayServer() {
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
 
-  let tasks: { id: string; title: string; status: string | null; due_at: string | null }[] = [];
-  let promises: { id: string; title: string; status: string | null; due_at: string | null }[] = [];
+  type Item = { id: string; title: string; status: string | null; due_at: string | null };
+  let tasks: Item[] = [];
+  let promises: Item[] = [];
+  let waiting: Item[] = [];
+  let topTask: Item | null = null;
 
   if (user) {
-    const [tRes, pRes] = await Promise.all([
+    const [tRes, pRes, wRes] = await Promise.all([
       supabase
         .from("tasks")
-        .select("id,title,status,due_at")
+        .select("id,title,status,due_at,priority")
         .eq("assigned_to", user.id)
         .neq("status", "done")
+        .order("priority", { ascending: true })
         .order("due_at", { ascending: true, nullsFirst: false })
-        .limit(10),
+        .limit(8),
       supabase
         .from("promises")
         .select("id,title,status,due_at")
         .eq("assigned_to", user.id)
         .neq("status", "done")
         .order("due_at", { ascending: true, nullsFirst: false })
-        .limit(8),
+        .limit(6),
+      supabase
+        .from("tasks")
+        .select("id,title,status,due_at")
+        .eq("assigned_to", user.id)
+        .eq("status", "waiting_on_client")
+        .limit(5),
     ]);
-    tasks = (tRes.data ?? []) as typeof tasks;
-    promises = (pRes.data ?? []) as typeof promises;
+    tasks = (tRes.data ?? []) as Item[];
+    promises = (pRes.data ?? []) as Item[];
+    waiting = (wRes.data ?? []) as Item[];
+    topTask = tasks[0] ?? null;
   }
 
   return (
-    <div className="space-y-6 pb-8">
-      <PageHeader title="My Day" subtitle="What you own today — pulled from live tasks and promises." />
+    <div className="space-y-6 pb-12">
+      <PageHeader
+        eyebrow="Personal cockpit"
+        title="My Day"
+        subtitle="Your focus today — pulled live from tasks, promises, and waiting items."
+      />
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <SurfaceCard className="p-6">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-base font-semibold text-slate-900">My tasks</h2>
+      <CommandBar chips={chips} />
+
+      <div className="grid gap-4 xl:grid-cols-12 xl:gap-5">
+        <div className="xl:col-span-7">
+          {topTask ? (
+            <NextBestAction
+              subject={topTask.title}
+              due={topTask.due_at ? `Due ${new Date(topTask.due_at).toLocaleString()}` : "Today"}
+              reason="Top of your queue right now."
+              ctaHref="/tasks"
+            />
+          ) : (
+            <NextBestAction
+              subject="Nothing urgent — clear horizon"
+              due="No deadlines pressing"
+              reason="Take a moment to plan, reach out to clients, or open Radar."
+              ctaHref="/radar"
+            />
+          )}
+        </div>
+
+        <div className="xl:col-span-5">
+          <GlassCard className="h-full p-6">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-base font-semibold text-fg">Today’s focus</h2>
+              <PulseBadge label={`${tasks.length} open`} tone="accent" />
+            </div>
+            <ul className="mt-3 space-y-2">
+              {tasks.length === 0 ? (
+                <li className="rounded-2xl border border-dashed border-token-soft bg-surface/60 px-4 py-3 text-sm text-fg-soft">
+                  No open tasks assigned to you. Enjoy the calm — or help a teammate.
+                </li>
+              ) : (
+                tasks.slice(0, 5).map((t) => (
+                  <li
+                    key={t.id}
+                    className="flex items-start justify-between gap-3 rounded-2xl border border-token-soft bg-surface/70 px-4 py-3"
+                  >
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-semibold text-fg">{t.title}</div>
+                      <div className="text-xs text-fg-soft">
+                        {(t.status ?? "").replaceAll("_", " ")}
+                        {t.due_at ? ` · due ${new Date(t.due_at).toLocaleString()}` : ""}
+                      </div>
+                    </div>
+                    <Clock className="mt-0.5 h-4 w-4 shrink-0 text-fg-soft" />
+                  </li>
+                ))
+              )}
+            </ul>
             <Link href="/tasks">
-              <GradientButton className="!py-2 !text-xs">
-                Open tasks <ArrowRight className="h-3.5 w-3.5" />
+              <GradientButton variant="secondary" size="sm" className="mt-3">
+                Open all tasks <ArrowRight className="h-4 w-4" />
               </GradientButton>
             </Link>
-          </div>
-          <ul className="mt-4 space-y-2">
-            {tasks.length === 0 ? (
-              <li className="text-sm text-slate-600">No open tasks assigned to you.</li>
-            ) : (
-              tasks.map((t) => (
-                <li
-                  key={t.id}
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800"
-                >
-                  <div className="font-medium">{t.title}</div>
-                  <div className="mt-0.5 text-xs text-slate-500">
-                    {(t.status ?? "").replaceAll("_", " ")}
-                    {t.due_at ? ` · due ${new Date(t.due_at).toLocaleString()}` : ""}
-                  </div>
-                </li>
-              ))
-            )}
-          </ul>
-        </SurfaceCard>
+          </GlassCard>
+        </div>
 
-        <SurfaceCard className="p-6">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-base font-semibold text-slate-900">My promises</h2>
-            <Link href="/promises">
-              <GradientButton variant="secondary" className="!py-2 !text-xs">
-                Open promises <ArrowRight className="h-3.5 w-3.5" />
-              </GradientButton>
-            </Link>
-          </div>
-          <ul className="mt-4 space-y-2">
-            {promises.length === 0 ? (
-              <li className="text-sm text-slate-600">No active promises assigned to you.</li>
-            ) : (
-              promises.map((p) => (
-                <li
-                  key={p.id}
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800"
-                >
-                  <div className="font-medium">{p.title}</div>
-                  <div className="mt-0.5 text-xs text-slate-500">
-                    {(p.status ?? "active").replaceAll("_", " ")}
-                    {p.due_at ? ` · due ${new Date(p.due_at).toLocaleString()}` : ""}
-                  </div>
-                </li>
-              ))
-            )}
-          </ul>
-        </SurfaceCard>
-      </div>
-
-      <SurfaceCard className="p-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-base font-semibold text-slate-900">Clients & projects</h2>
-            <p className="mt-1 text-sm text-slate-600">Jump to your portfolio.</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/clients">
-              <GradientButton variant="secondary" className="!py-2 !text-xs">
-                My clients
-              </GradientButton>
-            </Link>
-            <Link href="/projects">
-              <GradientButton variant="secondary" className="!py-2 !text-xs">
-                My projects
-              </GradientButton>
-            </Link>
+        <div className="xl:col-span-12">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <InsightCard icon={ListTodo} tone="accent" label="My tasks" value={tasks.length} meta="open and assigned" />
+            <InsightCard
+              icon={Handshake}
+              tone="calm"
+              label="My promises"
+              value={promises.length}
+              meta="active commitments"
+            />
+            <InsightCard icon={Clock} tone="warn" label="Waiting on client" value={waiting.length} meta="blocked items" />
+            <InsightCard icon={Sparkles} tone="neutral" label="Drafts ready" value="—" meta="AI suggestions live" />
           </div>
         </div>
-      </SurfaceCard>
+
+        <div className="xl:col-span-7">
+          <GlassCard className="h-full p-6">
+            <h2 className="text-base font-semibold text-fg">My promises</h2>
+            <ul className="mt-3 space-y-2">
+              {promises.length === 0 ? (
+                <li className="rounded-2xl border border-dashed border-token-soft bg-surface/60 px-4 py-3 text-sm text-fg-soft">
+                  No active promises assigned to you.
+                </li>
+              ) : (
+                promises.map((p) => (
+                  <li
+                    key={p.id}
+                    className="flex items-start justify-between gap-3 rounded-2xl border border-token-soft bg-surface/70 px-4 py-3"
+                  >
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-semibold text-fg">{p.title}</div>
+                      <div className="text-xs text-fg-soft">
+                        {(p.status ?? "active").replaceAll("_", " ")}
+                        {p.due_at ? ` · due ${new Date(p.due_at).toLocaleString()}` : ""}
+                      </div>
+                    </div>
+                  </li>
+                ))
+              )}
+            </ul>
+          </GlassCard>
+        </div>
+
+        <div className="xl:col-span-5">
+          <GlassCard className="h-full p-6">
+            <h2 className="text-base font-semibold text-fg">Waiting on client</h2>
+            <ul className="mt-3 space-y-2">
+              {waiting.length === 0 ? (
+                <li className="rounded-2xl border border-dashed border-token-soft bg-surface/60 px-4 py-3 text-sm text-fg-soft">
+                  Nothing blocked right now.
+                </li>
+              ) : (
+                waiting.map((t) => (
+                  <li
+                    key={t.id}
+                    className="rounded-2xl border border-token-soft bg-surface/70 px-4 py-3 text-sm text-fg"
+                  >
+                    {t.title}
+                  </li>
+                ))
+              )}
+            </ul>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link href="/clients">
+                <GradientButton variant="secondary" size="sm">
+                  My clients
+                </GradientButton>
+              </Link>
+              <Link href="/projects">
+                <GradientButton variant="secondary" size="sm">
+                  My projects
+                </GradientButton>
+              </Link>
+            </div>
+          </GlassCard>
+        </div>
+      </div>
     </div>
   );
 }
