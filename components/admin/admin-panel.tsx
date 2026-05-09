@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { GlassCard } from "@/components/command-center/glass-card";
 import { PageHeader } from "@/components/ui/page-header";
 import { toast } from "@/components/ui/toast";
@@ -68,6 +69,7 @@ export function AdminPanel({
   organizations,
   invitations,
   loadError,
+  showWorkspaceBootstrap,
   sessionDiagnostic,
   sessionDiagnosticError,
 }: {
@@ -77,9 +79,12 @@ export function AdminPanel({
   organizations: AdminOrgRow[];
   invitations: AdminInviteRow[];
   loadError: string | null;
+  /** True when all admin RPCs returned empty — usually no org/profile rows yet (empty public schema). */
+  showWorkspaceBootstrap: boolean;
   sessionDiagnostic: Record<string, unknown> | null;
   sessionDiagnosticError: string | null;
 }) {
+  const router = useRouter();
   const [tab, setTab] = React.useState<Tab>("users");
 
   const profilesOrdered = React.useMemo(() => {
@@ -138,39 +143,22 @@ export function AdminPanel({
         </GlassCard>
       ) : null}
 
-      {sessionDiagnostic ? (
-        <GlassCard className="border border-token-soft bg-surface/50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-fg-muted">Server diagnostic</p>
-          <p className="mt-1 text-xs text-fg-soft">
-            From your live session (not the SQL editor).{" "}
-            <span className="font-medium text-fg">is_platform_admin</span> must be true for lists to load. If{" "}
-            <span className="font-medium text-fg">auth_uid</span> is null but{" "}
-            <span className="font-medium text-fg">request_user_id</span> is set, this migration fixed that gap.
-          </p>
-          <pre className="mt-3 max-h-48 overflow-auto rounded-xl border border-token-soft bg-surface/80 p-3 text-[11px] leading-relaxed text-fg-soft">
-            {JSON.stringify(sessionDiagnostic, null, 2)}
-          </pre>
-        </GlassCard>
-      ) : null}
-
-      {sessionDiagnostic &&
-      typeof sessionDiagnostic.profiles_row_count === "number" &&
-      sessionDiagnostic.profiles_row_count === 0 ? (
+      {showWorkspaceBootstrap ? (
         <GlassCard className="border border-emerald-500/35 bg-emerald-500/10 p-4 md:p-6">
           <h2 className="text-lg font-semibold text-fg">Create your first workspace</h2>
           <p className="mt-1 text-sm text-fg-soft">
-            Permissions are fine (<span className="font-medium text-fg">is_platform_admin</span> is true), but this
-            project has no <code className="rounded bg-surface/80 px-1">organizations</code> or{" "}
-            <code className="rounded bg-surface/80 px-1">profiles</code> rows yet — only{" "}
-            <code className="rounded bg-surface/80 px-1">auth.users</code>. That is why every admin tab is empty. Run the
-            same <code className="rounded bg-surface/80 px-1">create_workspace</code> step as signup, or submit below.
+            Admin lists are empty because <code className="rounded bg-surface/80 px-1">public.profiles</code> and{" "}
+            <code className="rounded bg-surface/80 px-1">public.organizations</code> have no rows yet (only{" "}
+            <code className="rounded bg-surface/80 px-1">auth.users</code>). That is not a git or migration problem — you
+            still need the first workspace. Submit once (same RPC as signup); then this page will show data.
           </p>
           <form
             className="mt-4 flex max-w-lg flex-col gap-3"
             action={async (fd) => {
               try {
                 await bootstrapWorkspaceIfMissingAction(fd);
-                toast("Workspace created. Refresh if tables do not update.");
+                toast("Workspace created.");
+                router.refresh();
               } catch (e) {
                 toast(e instanceof Error ? e.message : "Something went wrong.");
               }
@@ -199,6 +187,21 @@ export function AdminPanel({
               Create workspace and profile
             </button>
           </form>
+        </GlassCard>
+      ) : null}
+
+      {sessionDiagnostic ? (
+        <GlassCard className="border border-token-soft bg-surface/50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-fg-muted">Server diagnostic</p>
+          <p className="mt-1 text-xs text-fg-soft">
+            From your live session (not the SQL editor).{" "}
+            <span className="font-medium text-fg">is_platform_admin</span> must be true for lists to load. If{" "}
+            <span className="font-medium text-fg">auth_uid</span> is null but{" "}
+            <span className="font-medium text-fg">request_user_id</span> is set, this migration fixed that gap.
+          </p>
+          <pre className="mt-3 max-h-48 overflow-auto rounded-xl border border-token-soft bg-surface/80 p-3 text-[11px] leading-relaxed text-fg-soft">
+            {JSON.stringify(sessionDiagnostic, null, 2)}
+          </pre>
         </GlassCard>
       ) : null}
 
@@ -236,16 +239,21 @@ export function AdminPanel({
             <div className="mt-4 rounded-2xl border border-amber-500/35 bg-amber-500/10 p-4">
               <p className="text-sm font-semibold text-fg">No rows returned</p>
               <p className="mt-1 text-sm text-fg-soft">
-                Admin RPCs only return rows when <code className="rounded bg-surface/80 px-1">is_platform_admin()</code>{" "}
-                is true for your session. Common causes: empty or stale{" "}
-                <code className="rounded bg-surface/80 px-1">profiles.email</code> hiding your JWT email, or OAuth email
-                only in <code className="rounded bg-surface/80 px-1">user_metadata</code>.                 Apply{" "}
-                <code className="rounded bg-surface/80 px-1">20260209200000_platform_admin_request_user_id.sql</code>{" "}
-                (or run all migrations via <code className="rounded bg-surface/80 px-1">supabase db push</code>), then
-                refresh. Use the <span className="font-medium text-fg">Server diagnostic</span> block above: if{" "}
-                <code className="rounded bg-surface/80 px-1">profiles_row_count</code> is 0, there are no profile rows to
-                show. If counts are above 0 but <code className="rounded bg-surface/80 px-1">is_platform_admin</code> is
-                false, the database still does not treat this login as admin.
+                {showWorkspaceBootstrap ? (
+                  <>
+                    There are no rows in <code className="rounded bg-surface/80 px-1">public.profiles</code> yet. Use the
+                    green <span className="font-medium text-fg">Create your first workspace</span> section above —{" "}
+                    <span className="font-medium text-fg">commit/push does not insert database rows</span>.
+                  </>
+                ) : (
+                  <>
+                    Admin RPCs only return data when <code className="rounded bg-surface/80 px-1">is_platform_admin()</code>{" "}
+                    is true for your session. If the <span className="font-medium text-fg">Server diagnostic</span> shows{" "}
+                    <code className="rounded bg-surface/80 px-1">is_platform_admin: false</code>, apply migrations through{" "}
+                    <code className="rounded bg-surface/80 px-1">20260209200000_platform_admin_request_user_id.sql</code> on
+                    Supabase and refresh.
+                  </>
+                )}
               </p>
             </div>
           ) : null}

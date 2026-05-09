@@ -51,6 +51,7 @@ export default async function AdminPage() {
       organizations={organizations}
       invitations={invitations}
       loadError={err}
+      showWorkspaceBootstrap={allListsEmpty && !err}
       sessionDiagnostic={
         allListsEmpty && !err ? ((diagRes.data ?? null) as Record<string, unknown> | null) : null
       }
