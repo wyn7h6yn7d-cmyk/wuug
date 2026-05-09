@@ -67,6 +67,8 @@ export function AdminPanel({
   organizations,
   invitations,
   loadError,
+  sessionDiagnostic,
+  sessionDiagnosticError,
 }: {
   signedInUserId: string;
   signedInEmail: string;
@@ -74,6 +76,8 @@ export function AdminPanel({
   organizations: AdminOrgRow[];
   invitations: AdminInviteRow[];
   loadError: string | null;
+  sessionDiagnostic: Record<string, unknown> | null;
+  sessionDiagnosticError: string | null;
 }) {
   const [tab, setTab] = React.useState<Tab>("users");
 
@@ -121,6 +125,33 @@ export function AdminPanel({
         </GlassCard>
       ) : null}
 
+      {sessionDiagnosticError ? (
+        <GlassCard className="border border-rose-500/35 bg-rose-500/10 p-4">
+          <p className="text-sm font-semibold text-fg">Session diagnostic unavailable</p>
+          <p className="mt-1 text-xs text-fg-soft">{sessionDiagnosticError}</p>
+          <p className="mt-2 text-xs text-fg-soft">
+            Run <code className="rounded bg-surface/80 px-1">20260209200000_platform_admin_request_user_id.sql</code> on
+            your Supabase project (adds <code className="rounded bg-surface/80 px-1">admin_session_diagnostic</code>),
+            then refresh.
+          </p>
+        </GlassCard>
+      ) : null}
+
+      {sessionDiagnostic ? (
+        <GlassCard className="border border-token-soft bg-surface/50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-fg-muted">Server diagnostic</p>
+          <p className="mt-1 text-xs text-fg-soft">
+            From your live session (not the SQL editor).{" "}
+            <span className="font-medium text-fg">is_platform_admin</span> must be true for lists to load. If{" "}
+            <span className="font-medium text-fg">auth_uid</span> is null but{" "}
+            <span className="font-medium text-fg">request_user_id</span> is set, this migration fixed that gap.
+          </p>
+          <pre className="mt-3 max-h-48 overflow-auto rounded-xl border border-token-soft bg-surface/80 p-3 text-[11px] leading-relaxed text-fg-soft">
+            {JSON.stringify(sessionDiagnostic, null, 2)}
+          </pre>
+        </GlassCard>
+      ) : null}
+
       <div className="flex flex-wrap gap-2">
         {(
           [
@@ -158,14 +189,13 @@ export function AdminPanel({
                 Admin RPCs only return rows when <code className="rounded bg-surface/80 px-1">is_platform_admin()</code>{" "}
                 is true for your session. Common causes: empty or stale{" "}
                 <code className="rounded bg-surface/80 px-1">profiles.email</code> hiding your JWT email, or OAuth email
-                only in <code className="rounded bg-surface/80 px-1">user_metadata</code>.                 Run the latest SQL in{" "}
-                <code className="rounded bg-surface/80 px-1">supabase/migrations/</code> through{" "}
-                <code className="rounded bg-surface/80 px-1">20260209190000_master_admin_session_auth_users.sql</code>{" "}
-                (<code className="rounded bg-surface/80 px-1">supabase db push</code> or paste in the SQL editor), then
-                refresh. Open <span className="font-medium text-fg">Workspaces</span> too — if every tab is empty, your
-                session still is not seen as platform admin. If only Users is empty, check{" "}
-                <code className="rounded bg-surface/80 px-1">select count(*) from public.profiles</code> in SQL (no rows
-                means nothing to list).
+                only in <code className="rounded bg-surface/80 px-1">user_metadata</code>.                 Apply{" "}
+                <code className="rounded bg-surface/80 px-1">20260209200000_platform_admin_request_user_id.sql</code>{" "}
+                (or run all migrations via <code className="rounded bg-surface/80 px-1">supabase db push</code>), then
+                refresh. Use the <span className="font-medium text-fg">Server diagnostic</span> block above: if{" "}
+                <code className="rounded bg-surface/80 px-1">profiles_row_count</code> is 0, there are no profile rows to
+                show. If counts are above 0 but <code className="rounded bg-surface/80 px-1">is_platform_admin</code> is
+                false, the database still does not treat this login as admin.
               </p>
             </div>
           ) : null}

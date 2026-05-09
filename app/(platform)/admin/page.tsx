@@ -26,10 +26,11 @@ export default async function AdminPage() {
     redirect("/");
   }
 
-  const [profilesRes, orgsRes, invitesRes] = await Promise.all([
+  const [profilesRes, orgsRes, invitesRes, diagRes] = await Promise.all([
     supabase.rpc("admin_list_profiles"),
     supabase.rpc("admin_list_organizations"),
     supabase.rpc("admin_list_invitations"),
+    supabase.rpc("admin_session_diagnostic"),
   ]);
 
   const rpcErrors = [profilesRes.error, orgsRes.error, invitesRes.error].filter(
@@ -37,14 +38,23 @@ export default async function AdminPage() {
   );
   const err = rpcErrors.length ? rpcErrors.map((e) => e.message).join(" · ") : null;
 
+  const profiles = (profilesRes.data ?? []) as AdminProfileRow[];
+  const organizations = (orgsRes.data ?? []) as AdminOrgRow[];
+  const invitations = (invitesRes.data ?? []) as AdminInviteRow[];
+  const allListsEmpty = profiles.length === 0 && organizations.length === 0 && invitations.length === 0;
+
   return (
     <AdminPanel
       signedInUserId={user.id}
       signedInEmail={user.email ?? ""}
-      profiles={(profilesRes.data ?? []) as AdminProfileRow[]}
-      organizations={(orgsRes.data ?? []) as AdminOrgRow[]}
-      invitations={(invitesRes.data ?? []) as AdminInviteRow[]}
+      profiles={profiles}
+      organizations={organizations}
+      invitations={invitations}
       loadError={err}
+      sessionDiagnostic={
+        allListsEmpty && !err ? ((diagRes.data ?? null) as Record<string, unknown> | null) : null
+      }
+      sessionDiagnosticError={allListsEmpty && !err ? (diagRes.error?.message ?? null) : null}
     />
   );
 }
