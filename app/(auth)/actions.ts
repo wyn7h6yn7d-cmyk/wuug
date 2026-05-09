@@ -49,9 +49,12 @@ export async function signIn(formData: FormData) {
         redirect(`/login?error=1&msg=${encodeErr(acceptError.message)}${inviteQ}`);
       }
     } else {
-      await supabase.rpc("accept_pending_invitation_for_user", {
+      const { error: pendingErr } = await supabase.rpc("accept_pending_invitation_for_user", {
         p_full_name: fullName,
       });
+      if (pendingErr) {
+        redirect(`/login?error=1&msg=${encodeErr(pendingErr.message)}`);
+      }
     }
   }
 
