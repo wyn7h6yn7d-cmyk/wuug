@@ -32,7 +32,10 @@ export default async function AdminPage() {
     supabase.rpc("admin_list_invitations"),
   ]);
 
-  const err = profilesRes.error ?? orgsRes.error ?? invitesRes.error;
+  const rpcErrors = [profilesRes.error, orgsRes.error, invitesRes.error].filter(
+    (e): e is NonNullable<typeof e> => e != null,
+  );
+  const err = rpcErrors.length ? rpcErrors.map((e) => e.message).join(" · ") : null;
 
   return (
     <AdminPanel
@@ -41,7 +44,7 @@ export default async function AdminPage() {
       profiles={(profilesRes.data ?? []) as AdminProfileRow[]}
       organizations={(orgsRes.data ?? []) as AdminOrgRow[]}
       invitations={(invitesRes.data ?? []) as AdminInviteRow[]}
-      loadError={err?.message ?? null}
+      loadError={err}
     />
   );
 }

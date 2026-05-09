@@ -155,12 +155,14 @@ export function AdminPanel({
             <div className="mt-4 rounded-2xl border border-amber-500/35 bg-amber-500/10 p-4">
               <p className="text-sm font-semibold text-fg">No rows returned</p>
               <p className="mt-1 text-sm text-fg-soft">
-                Admin lists use <code className="rounded bg-surface/80 px-1">is_platform_admin()</code> in the database.
-                If you open this page as the master admin email but your profile row does not have{" "}
-                <code className="rounded bg-surface/80 px-1">platform_admin = true</code>, RPCs return nothing until you
-                apply{" "}
-                <code className="rounded bg-surface/80 px-1">20260209170000_platform_admin_master_session.sql</code>{" "}
-                (or run <code className="rounded bg-surface/80 px-1">supabase db push</code>), then refresh.
+                Admin RPCs only return rows when <code className="rounded bg-surface/80 px-1">is_platform_admin()</code>{" "}
+                is true for your session. Common causes: empty or stale{" "}
+                <code className="rounded bg-surface/80 px-1">profiles.email</code> hiding your JWT email, or OAuth email
+                only in <code className="rounded bg-surface/80 px-1">user_metadata</code>. Apply{" "}
+                <code className="rounded bg-surface/80 px-1">20260209180000_master_admin_session_email_fallback.sql</code>{" "}
+                (then <code className="rounded bg-surface/80 px-1">supabase db push</code> or run it in the SQL editor)
+                and refresh. If the <code className="rounded bg-surface/80 px-1">profiles</code> table is empty, add users
+                first — there is nothing to list yet.
               </p>
             </div>
           ) : null}
