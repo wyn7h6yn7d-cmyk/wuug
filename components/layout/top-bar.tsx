@@ -1,0 +1,35 @@
+import { Bell, Plus, Search } from "lucide-react";
+
+export function TopBar() {
+  return (
+    <header className="mb-6 flex flex-col gap-4 rounded-[24px] border border-[#E5EAF3] bg-white/90 p-4 shadow-[0_8px_30px_rgba(66,86,122,0.08)] md:flex-row md:items-center md:justify-between">
+      <label className="flex w-full items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 md:max-w-xl">
+        <Search className="h-4 w-4 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Otsi klienti, projekti või tegevust..."
+          className="w-full bg-transparent text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"
+        />
+      </label>
+
+      <div className="flex items-center gap-2 sm:gap-3">
+        <button className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-500 via-violet-500 to-teal-400 px-4 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(97,107,255,0.28)] transition hover:opacity-95">
+          <Plus className="h-4 w-4" />
+          + Lisa uus
+        </button>
+        <button
+          className="rounded-2xl border border-slate-200 bg-white p-3 text-slate-600 transition hover:text-slate-900"
+          aria-label="Teavitused"
+        >
+          <Bell className="h-5 w-5" />
+        </button>
+        <div className="hidden items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 sm:flex">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 via-violet-100 to-teal-100 text-sm font-semibold text-slate-700">
+            E
+          </span>
+          <span className="text-sm font-medium text-slate-700">Eleonora</span>
+        </div>
+      </div>
+    </header>
+  );
+}
