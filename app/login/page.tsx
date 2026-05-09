@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BrandLogo } from "@/components/layout/brand-logo";
 import { SurfaceCard } from "@/components/ui/surface-card";
 import { signIn } from "@/app/(auth)/actions";
+import { ResendConfirmation } from "@/components/auth/resend-confirmation";
 
 export default async function LoginPage({
   searchParams,
@@ -10,6 +11,7 @@ export default async function LoginPage({
 }) {
   const params = (await searchParams) ?? {};
   const created = params.created === "1";
+  const confirm = params.confirm === "1";
   const error = params.error === "1";
 
   return (
@@ -26,6 +28,11 @@ export default async function LoginPage({
           {created ? (
             <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
               Account created. Sign in to continue.
+            </div>
+          ) : null}
+          {confirm ? (
+            <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-700">
+              Check your email to confirm your account, then come back to sign in.
             </div>
           ) : null}
           {error ? (
@@ -68,6 +75,8 @@ export default async function LoginPage({
               Create one
             </Link>
           </p>
+
+          {confirm ? <ResendConfirmation /> : null}
         </SurfaceCard>
       </div>
     </div>

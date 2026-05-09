@@ -49,7 +49,7 @@ export async function signUp(formData: FormData) {
   if (error) redirect("/signup?error=1");
 
   // If email confirmations are enabled, there may be no session yet.
-  if (!data.session) redirect("/login?created=1");
+  if (!data.session) redirect("/login?confirm=1");
 
   const { error: workspaceError } = await supabase.rpc("create_workspace", {
     p_organization_name: organizationName,

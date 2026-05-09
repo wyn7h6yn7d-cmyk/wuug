@@ -22,37 +22,48 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.next({ request: { headers: request.headers } });
   }
 
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
-
-  const supabase = createServerClient(url, anonKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
+  try {
+    let response = NextResponse.next({
+      request: {
+        headers: request.headers,
       },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+    });
+
+    const supabase = createServerClient(url, anonKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value),
+          );
+          response = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options),
+          );
+        },
       },
-    },
-  });
+    });
 
-  // Refresh session if needed; do not enforce redirects yet.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    // Refresh session if needed; if Supabase is misconfigured/unreachable,
+    // we don't want to take down the entire site (especially auth pages).
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  // Redirect authenticated users away from auth pages.
-  if (user && isAuthRoute(request.nextUrl.pathname)) {
-    const nextUrl = request.nextUrl.clone();
-    nextUrl.pathname = "/";
-    return NextResponse.redirect(nextUrl);
+    if (user && isAuthRoute(request.nextUrl.pathname)) {
+      const nextUrl = request.nextUrl.clone();
+      nextUrl.pathname = "/";
+      return NextResponse.redirect(nextUrl);
+    }
+
+    return response;
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Supabase session refresh failed; skipping middleware.", err);
+    }
+    return NextResponse.next({ request: { headers: request.headers } });
   }
-
-  return response;
 }
 

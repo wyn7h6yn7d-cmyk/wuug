@@ -166,7 +166,12 @@ function RegisterPageInner() {
                   return;
                 }
 
-                router.replace("/login?created=1");
+                // If email confirmations are enabled, there may be no session yet.
+                if (!signUpData.session) {
+                  router.replace("/login?confirm=1");
+                } else {
+                  router.replace("/login?created=1");
+                }
               } catch {
                 setFormError("Registration failed. Please try again.");
               } finally {
