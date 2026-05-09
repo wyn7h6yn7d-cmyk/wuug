@@ -3,14 +3,24 @@ import { AccessRestricted } from "@/components/access/access-restricted";
 import { TeamMemberHub } from "@/components/team/team-member-hub";
 import { TeamPageClient } from "@/components/team/team-page-client";
 import type { AppRole } from "@/lib/permissions";
+import { canAccessAdminPanel } from "@/lib/master-admin";
 
 export default async function TeamPage() {
   const { supabase, user } = await getPlatformSession();
-  if (!user) return <AccessRestricted backHref="/login" />;
+  if (!user) {
+    return (
+      <AccessRestricted
+        backHref="/login"
+        title="Sign in required"
+        subtitle="You need to be signed in to open Team."
+        ctaLabel="Back to sign in"
+      />
+    );
+  }
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, organization_id, role")
+    .select("id, organization_id, role, platform_admin")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -19,7 +29,21 @@ export default async function TeamPage() {
   const profileId = profile?.id ?? user.id;
 
   if (!organizationId) {
-    return <AccessRestricted backHref="/my-day" />;
+    const canOpenAdmin = canAccessAdminPanel(Boolean(profile?.platform_admin), user.email);
+    return (
+      <AccessRestricted
+        backHref="/my-day"
+        title="No workspace linked"
+        subtitle={
+          canOpenAdmin
+            ? "Your account has no company on file yet (no organization_id). Open Platform admin and use Create your first workspace, or complete signup so create_workspace runs."
+            : "Your account has no company on file yet. Ask an owner or manager to invite you to their workspace."
+        }
+        ctaLabel="Back to My Day"
+        secondaryHref={canOpenAdmin ? "/admin" : undefined}
+        secondaryLabel={canOpenAdmin ? "Platform admin" : undefined}
+      />
+    );
   }
 
   if (role === "member") {
