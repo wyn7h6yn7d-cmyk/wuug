@@ -272,14 +272,15 @@ export function SettingsHub() {
               <>
                 <h3 className="text-sm font-semibold text-fg">People & invitations</h3>
                 <p className="text-sm leading-relaxed text-fg-soft">
-                  Add teammates to <span className="font-medium text-fg">{orgLabel}</span> with an email invite and a
+                  Add teammates to <span className="font-medium text-fg">{orgLabel}</span> from Team: an invitation email
+                  (when configured) or a
                   secure signup link. Your role: <span className="font-medium text-fg">{roleLabel}</span>.
                 </p>
                 {canManageTeam ? (
                   <>
                     <p className="text-sm leading-relaxed text-fg-soft">
-                      Open <span className="font-medium text-fg">Team</span>, enter their email, choose Manager or
-                      Member, then copy the invite link and send it to them.
+                      Open <span className="font-medium text-fg">Team</span>, enter their email, and send the invitation
+                      (email when Resend is configured, otherwise the link is copied for you to share).
                     </p>
                     <div className="flex flex-wrap gap-2">
                       <PressableLink href="/team" variant="primary" size="sm">

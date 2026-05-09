@@ -4,6 +4,7 @@ import { TeamMemberHub } from "@/components/team/team-member-hub";
 import { TeamPageClient } from "@/components/team/team-page-client";
 import type { AppRole } from "@/lib/permissions";
 import { canAccessAdminPanel } from "@/lib/master-admin";
+import { isInviteEmailConfigured } from "@/lib/app-origin";
 
 export default async function TeamPage() {
   const { supabase, user } = await getPlatformSession();
@@ -82,6 +83,7 @@ export default async function TeamPage() {
       members={(members ?? []) as any[]}
       invitations={(pendingInvites ?? []) as any[]}
       appOrigin={origin}
+      inviteEmailEnabled={isInviteEmailConfigured()}
     />
   );
 }

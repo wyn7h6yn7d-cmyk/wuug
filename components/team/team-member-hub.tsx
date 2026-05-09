@@ -13,11 +13,11 @@ export function TeamMemberHub({ organizationName }: { organizationName: string }
         <h2 className="text-lg font-semibold text-fg">Who can invite people?</h2>
         <p className="mt-2 text-sm leading-relaxed text-fg-soft">
           Your role is <span className="font-medium text-fg">Member</span>. Owners and managers can open the Team page,
-          add emails, and copy an invite link to share with new teammates.
+          add emails, and send invitation emails (or copy a link if email delivery is not configured).
         </p>
         <p className="mt-3 text-sm leading-relaxed text-fg-soft">
-          Ask an owner or manager to send an invite, or forward them these steps:{" "}
-          <span className="font-medium text-fg">Team → Invite teammate → copy link</span>.
+          Ask an owner or manager to send an invite from{" "}
+          <span className="font-medium text-fg">Team → Invite teammate</span>.
         </p>
         <div className="mt-6 flex flex-wrap gap-2">
           <PressableLink href="/settings" variant="primary" size="sm">

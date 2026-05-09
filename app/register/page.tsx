@@ -121,9 +121,9 @@ function RegisterPageInner() {
                   You’re joining <span className="font-semibold">{invite.organization_name}</span> as{" "}
                   <span className="font-semibold">{invite.role === "manager" ? "Manager" : "Team Member"}</span>.
                   <span className="mt-2 block text-xs text-slate-600">
-                    Wuug does not email this link—whoever invited you should send it (Slack, text, etc.). If your project
-                    uses Supabase email confirmation, check your inbox and spam for a message from Supabase after you
-                    register.
+                    You should receive an email with an invitation link when your workspace has Resend configured. If your
+                    project uses Supabase email confirmation, also check inbox and spam for a confirmation message after
+                    you register.
                   </span>
                 </span>
               ) : null}
