@@ -1,12 +1,5 @@
-import { FeaturePage } from "@/components/ui/feature-page";
-import { pageHighlights } from "@/lib/mock-data";
+import { SettingsView } from "@/components/settings/settings-view";
 
 export default function SettingsPage() {
-  return (
-    <FeaturePage
-      title="Seaded"
-      subtitle="Kohanda töölauda, teavitusi ja meeskonna töövoogu."
-      highlights={pageHighlights.settings}
-    />
-  );
+  return <SettingsView />;
 }

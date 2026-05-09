@@ -1,4 +1,5 @@
-import { Bell, Plus, Search } from "lucide-react";
+import { Bell, Search } from "lucide-react";
+import { CreateItemFlow } from "@/components/actions/create-item-flow";
 
 export function TopBar() {
   return (
@@ -13,21 +14,18 @@ export function TopBar() {
       </label>
 
       <div className="flex items-center gap-2 sm:gap-3">
-        <button className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-500 via-violet-500 to-teal-400 px-4 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(97,107,255,0.28)] transition hover:opacity-95">
-          <Plus className="h-4 w-4" />
-          + Lisa uus
-        </button>
+        <CreateItemFlow />
         <button
-          className="rounded-2xl border border-slate-200 bg-white p-3 text-slate-600 transition hover:text-slate-900"
+          className="rounded-2xl border border-slate-200 bg-white p-3 text-slate-600 hover:border-slate-300 hover:text-slate-900 active:scale-[0.98]"
           aria-label="Teavitused"
         >
           <Bell className="h-5 w-5" />
         </button>
-        <div className="hidden items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 sm:flex">
+        <div className="hidden items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm sm:flex">
           <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 via-violet-100 to-teal-100 text-sm font-semibold text-slate-700">
             E
           </span>
-          <span className="text-sm font-medium text-slate-700">Eleonora</span>
+          <span className="text-sm font-medium text-slate-700">Minu konto</span>
         </div>
       </div>
     </header>

@@ -10,7 +10,7 @@ export function SidebarNav() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-full rounded-[28px] border border-[#E5EAF3] bg-white/90 p-5 shadow-[0_8px_30px_rgba(66,86,122,0.08)] lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:w-64">
+    <aside className="hidden w-full rounded-[28px] border border-[#E5EAF3] bg-white/90 p-5 shadow-[0_8px_30px_rgba(66,86,122,0.08)] lg:sticky lg:top-6 lg:block lg:h-[calc(100vh-3rem)] lg:w-64">
       <div className="mb-8">
         <BrandLogo />
       </div>

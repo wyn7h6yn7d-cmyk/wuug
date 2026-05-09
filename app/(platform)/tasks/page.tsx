@@ -1,12 +1,5 @@
-import { FeaturePage } from "@/components/ui/feature-page";
-import { pageHighlights } from "@/lib/mock-data";
+import { TasksView } from "@/components/tasks/tasks-view";
 
 export default function TasksPage() {
-  return (
-    <FeaturePage
-      title="Tegevused"
-      subtitle="Kõik järgmised sammud prioriteetselt ja selgelt."
-      highlights={pageHighlights.tasks}
-    />
-  );
+  return <TasksView />;
 }

@@ -1,12 +1,5 @@
-import { FeaturePage } from "@/components/ui/feature-page";
-import { pageHighlights } from "@/lib/mock-data";
+import { ProjectsView } from "@/components/projects/projects-view";
 
 export default function ProjectsPage() {
-  return (
-    <FeaturePage
-      title="Projektid"
-      subtitle="Jälgi edenemist, riske ja järgmisi samme ühes vaates."
-      highlights={pageHighlights.projects}
-    />
-  );
+  return <ProjectsView />;
 }

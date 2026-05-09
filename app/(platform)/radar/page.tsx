@@ -1,12 +1,5 @@
-import { FeaturePage } from "@/components/ui/feature-page";
-import { pageHighlights } from "@/lib/mock-data";
+import { RadarView } from "@/components/radar/radar-view";
 
 export default function RadarPage() {
-  return (
-    <FeaturePage
-      title="Radar"
-      subtitle="Vaata, mis kipub ununema enne kui tekib probleem."
-      highlights={pageHighlights.radar}
-    />
-  );
+  return <RadarView />;
 }

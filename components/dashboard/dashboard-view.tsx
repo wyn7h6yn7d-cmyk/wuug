@@ -16,7 +16,7 @@ export function DashboardView() {
   return (
     <div className="space-y-6 pb-8">
       <FadeIn>
-        <PageHeader title="Tere, Eleonora 👋" subtitle="Siin on sinu tänane töölaud." />
+        <PageHeader title="Tere 👋" subtitle="Siin on sinu tänane töölaud." />
       </FadeIn>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
