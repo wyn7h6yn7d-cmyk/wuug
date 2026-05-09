@@ -1,5 +1,6 @@
 import { getPlatformSession } from "@/lib/platform-session";
 import { AccessRestricted } from "@/components/access/access-restricted";
+import { TeamMemberHub } from "@/components/team/team-member-hub";
 import { TeamPageClient } from "@/components/team/team-page-client";
 import type { AppRole } from "@/lib/permissions";
 
@@ -17,8 +18,18 @@ export default async function TeamPage() {
   const organizationId = profile?.organization_id ?? null;
   const profileId = profile?.id ?? user.id;
 
-  if (role === "member" || !organizationId) {
+  if (!organizationId) {
     return <AccessRestricted backHref="/my-day" />;
+  }
+
+  if (role === "member") {
+    const { data: org } = await supabase
+      .from("organizations")
+      .select("name")
+      .eq("id", organizationId)
+      .maybeSingle();
+    const organizationName = org?.name?.trim() || "your workspace";
+    return <TeamMemberHub organizationName={organizationName} />;
   }
 
   const { data: members } = await supabase

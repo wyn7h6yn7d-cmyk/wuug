@@ -6,6 +6,7 @@ import { Bell, ChevronDown, LogOut, Search, Settings as SettingsIcon } from "luc
 import { CreateItemFlow } from "@/components/actions/create-item-flow";
 import { useAuth } from "@/components/providers/auth-provider";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { cn } from "@/lib/utils";
 
 export function TopBar() {
   const { profile, user, organization, isLoading, signOut } = useAuth();
@@ -24,7 +25,12 @@ export function TopBar() {
   }, [open]);
 
   const displayName = profile?.full_name?.trim() || user?.email?.trim() || "";
-  const companyName = organization?.name?.trim() ?? "";
+  const meta = user?.user_metadata;
+  const metaOrgName =
+    meta && typeof meta === "object" && typeof (meta as { organization_name?: unknown }).organization_name === "string"
+      ? String((meta as { organization_name: string }).organization_name).trim()
+      : "";
+  const companyName = organization?.name?.trim() || metaOrgName;
   const accountPillLabel = companyName || displayName || "";
 
   const initials =
@@ -87,7 +93,7 @@ export function TopBar() {
             <span className="flex h-8 w-8 items-center justify-center rounded-xl gradient-sheen text-xs font-bold text-white">
               {initials}
             </span>
-            <span className="hidden max-w-[180px] truncate text-sm font-medium text-fg md:inline">
+            <span className="max-w-[200px] truncate text-sm font-medium text-fg sm:inline">
               {isLoading ? "Loading…" : accountPillLabel || "My account"}
             </span>
             <ChevronDown className="h-4 w-4 text-fg-soft" />
@@ -96,8 +102,13 @@ export function TopBar() {
           {open ? (
             <div className="absolute right-0 z-40 mt-2 w-60 overflow-hidden rounded-2xl border border-token-soft bg-surface/95 shadow-[0_24px_60px_rgba(15,23,42,0.16)] backdrop-blur dark:bg-surface/90 dark:shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
               <div className="px-4 py-3">
-                <div className="text-sm font-semibold text-fg">{displayName || "Account"}</div>
-                <div className="text-xs text-fg-soft">{profile?.email ?? user?.email ?? ""}</div>
+                {companyName ? (
+                  <div className="text-sm font-semibold text-fg">{companyName}</div>
+                ) : null}
+                <div className={cn("text-sm font-semibold text-fg", companyName && "mt-0.5 text-xs font-normal text-fg-soft")}>
+                  {displayName || "Account"}
+                </div>
+                <div className="mt-1 text-xs text-fg-soft">{profile?.email ?? user?.email ?? ""}</div>
               </div>
               <div className="h-px bg-token-soft/70" />
               <Link

@@ -15,12 +15,17 @@ import {
 } from "@/lib/wuug-user-settings";
 
 const SECTIONS = [
-  { id: "team", label: "Team roles" },
+  { id: "people", label: "People & invitations" },
+  { id: "account", label: "Profile & email" },
+  { id: "security", label: "Password" },
   { id: "notifications", label: "Notification rules" },
   { id: "integrations", label: "Integrations" },
+  { id: "danger", label: "Data & deletion" },
 ] as const;
 
 type SectionId = (typeof SECTIONS)[number]["id"];
+
+const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL?.trim() ?? "";
 
 function SettingsSwitchRow({
   label,
@@ -69,19 +74,41 @@ function SettingsSwitchRow({
   );
 }
 
+function inputClass(disabled?: boolean) {
+  return cn(
+    "mt-1.5 w-full rounded-2xl border border-token-soft bg-surface/80 px-3.5 py-2.5 text-sm text-fg placeholder:text-fg-soft focus:outline-none focus:ring-2 focus:ring-[rgb(var(--ring))] focus:ring-offset-2 focus:ring-offset-[var(--background)]",
+    disabled && "cursor-not-allowed opacity-60",
+  );
+}
+
 export function SettingsHub() {
-  const { user, role, isLoading } = useAuth();
+  const { user, profile, organization, role, isLoading, refreshProfile } = useAuth();
   const supabase = React.useMemo(() => createClient(), []);
 
-  const [selected, setSelected] = React.useState<SectionId>("team");
+  const [selected, setSelected] = React.useState<SectionId>("people");
   const [prefs, setPrefs] = React.useState<WuugUserSettings>(() => parseWuugSettings(user?.user_metadata));
   const [saving, setSaving] = React.useState(false);
+  const [savingProfile, setSavingProfile] = React.useState(false);
+  const [savingEmail, setSavingEmail] = React.useState(false);
+  const [savingPassword, setSavingPassword] = React.useState(false);
+
+  const [fullName, setFullName] = React.useState("");
+  const [emailInput, setEmailInput] = React.useState("");
+  const [newPassword, setNewPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
 
   React.useEffect(() => {
     if (user) setPrefs(parseWuugSettings(user.user_metadata));
   }, [user?.id, user?.user_metadata]);
 
+  React.useEffect(() => {
+    setFullName(profile?.full_name?.trim() ?? "");
+    setEmailInput(profile?.email?.trim() ?? user?.email?.trim() ?? "");
+  }, [profile?.full_name, profile?.email, user?.email]);
+
   const canManageTeam = role === "owner" || role === "manager";
+  const roleLabel = role ? role.charAt(0).toUpperCase() + role.slice(1) : "—";
+  const orgLabel = organization?.name?.trim() || "your workspace";
 
   const persist = React.useCallback(
     async (next: WuugUserSettings) => {
@@ -114,18 +141,89 @@ export function SettingsHub() {
     void persist(next);
   };
 
-  const roleLabel = role ? role.charAt(0).toUpperCase() + role.slice(1) : "—";
+  async function saveProfileName() {
+    if (!user?.id) return;
+    const next = fullName.trim();
+    if (!next) {
+      toast("Name can’t be empty.");
+      return;
+    }
+    setSavingProfile(true);
+    try {
+      const { error: profileErr } = await supabase.from("profiles").update({ full_name: next }).eq("id", user.id);
+      if (profileErr) {
+        toast(profileErr.message || "Couldn’t update profile.");
+        return;
+      }
+      const { error: authErr } = await supabase.auth.updateUser({ data: { full_name: next } });
+      if (authErr) {
+        toast(authErr.message || "Couldn’t sync name to your session.");
+        return;
+      }
+      await refreshProfile();
+      toast("Profile updated.");
+    } finally {
+      setSavingProfile(false);
+    }
+  }
+
+  async function saveEmail() {
+    const next = emailInput.trim().toLowerCase();
+    const current = (profile?.email ?? user?.email ?? "").trim().toLowerCase();
+    if (!next || next === current) {
+      toast("Enter a new email address.");
+      return;
+    }
+    setSavingEmail(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ email: next });
+      if (error) {
+        toast(error.message || "Couldn’t start email change.");
+        return;
+      }
+      toast("If confirmations are enabled, check both inboxes to confirm the change.");
+    } finally {
+      setSavingEmail(false);
+    }
+  }
+
+  async function savePassword() {
+    if (newPassword.length < 8) {
+      toast("Use at least 8 characters for your password.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast("Passwords don’t match.");
+      return;
+    }
+    setSavingPassword(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        toast(error.message || "Couldn’t update password.");
+        return;
+      }
+      setNewPassword("");
+      setConfirmPassword("");
+      toast("Password updated.");
+    } finally {
+      setSavingPassword(false);
+    }
+  }
 
   return (
     <div className="space-y-6 pb-8">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <PageHeader
           title="Settings"
-          subtitle="Workspace preferences, team access, and how Wuug reaches you."
+          subtitle="People, your profile, security, notifications, and workspace data."
         />
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <PressableLink href="/team" variant="primary" size="sm">
+            Team & invites
+          </PressableLink>
           <PressableLink href="/tasks" variant="secondary" size="sm">
-            Open tasks
+            Tasks
           </PressableLink>
         </div>
       </div>
@@ -134,7 +232,8 @@ export function SettingsHub() {
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-fg">Settings</h2>
           <p className="mt-2 text-sm text-fg-soft">
-            Pick a section to review or change. Notification and integration choices are saved to your account.
+            Choose a section. Profile and password changes apply to your login; notification toggles are stored on your
+            account.
           </p>
 
           <ul className="mt-4 list-none space-y-2 p-0" aria-label="Settings sections">
@@ -162,28 +261,127 @@ export function SettingsHub() {
           </ul>
 
           <div className="mt-6 space-y-4 rounded-2xl border border-token-soft bg-surface/60 p-4">
-            {selected === "team" ? (
+            {selected === "people" ? (
               <>
-                <h3 className="text-sm font-semibold text-fg">Team roles</h3>
+                <h3 className="text-sm font-semibold text-fg">People & invitations</h3>
                 <p className="text-sm leading-relaxed text-fg-soft">
-                  Roles control who can invite people, edit clients, and see the full workspace. Your current role is{" "}
-                  <span className="font-medium text-fg">{roleLabel}</span>.
+                  Add teammates to <span className="font-medium text-fg">{orgLabel}</span> with an email invite and a
+                  secure signup link. Your role: <span className="font-medium text-fg">{roleLabel}</span>.
                 </p>
                 {canManageTeam ? (
                   <>
                     <p className="text-sm leading-relaxed text-fg-soft">
-                      Open Team to invite members, resend invitations, and change roles between Owner, Manager, and
-                      Member.
+                      Open <span className="font-medium text-fg">Team</span>, enter their email, choose Manager or
+                      Member, then copy the invite link and send it to them.
                     </p>
-                    <PressableLink href="/team" variant="primary" size="sm">
-                      Open Team
-                    </PressableLink>
+                    <div className="flex flex-wrap gap-2">
+                      <PressableLink href="/team" variant="primary" size="sm">
+                        Invite teammates
+                      </PressableLink>
+                      <PressableLink href="/manager" variant="secondary" size="sm">
+                        Command Center
+                      </PressableLink>
+                    </div>
                   </>
                 ) : (
-                  <p className="text-sm leading-relaxed text-fg-soft">
-                    Only owners and managers can change roles. Ask a workspace admin if you need different access.
-                  </p>
+                  <>
+                    <p className="text-sm leading-relaxed text-fg-soft">
+                      Only owners and managers can send invitations. Ask an admin to open Team and create an invite for
+                      you.
+                    </p>
+                    <PressableLink href="/team" variant="secondary" size="sm">
+                      About team access
+                    </PressableLink>
+                  </>
                 )}
+              </>
+            ) : null}
+
+            {selected === "account" ? (
+              <>
+                <h3 className="text-sm font-semibold text-fg">Profile & email</h3>
+                <p className="text-sm text-fg-soft">
+                  Your display name appears across Wuug. Email is used to sign in; changing it may require confirmation
+                  links from Supabase.
+                </p>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-fg-muted">Full name</label>
+                  <input
+                    className={inputClass(isLoading)}
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    autoComplete="name"
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void saveProfileName()}
+                    disabled={savingProfile || isLoading}
+                    className="mt-3 rounded-2xl bg-[rgb(var(--accent))] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(99,102,241,0.35)] disabled:opacity-50"
+                  >
+                    {savingProfile ? "Saving…" : "Save name"}
+                  </button>
+                </div>
+                <div className="border-t border-token-soft/80 pt-4">
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-fg-muted">Email</label>
+                  <input
+                    type="email"
+                    className={inputClass(isLoading)}
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.target.value)}
+                    autoComplete="email"
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void saveEmail()}
+                    disabled={savingEmail || isLoading}
+                    className="mt-3 rounded-2xl border border-token-soft bg-surface/80 px-4 py-2.5 text-sm font-semibold text-fg disabled:opacity-50"
+                  >
+                    {savingEmail ? "Updating…" : "Request email change"}
+                  </button>
+                </div>
+              </>
+            ) : null}
+
+            {selected === "security" ? (
+              <>
+                <h3 className="text-sm font-semibold text-fg">Password</h3>
+                <p className="text-sm text-fg-soft">
+                  You’re signed in, so you can set a new password without the old one. Use at least 8 characters.
+                </p>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-fg-muted">New password</label>
+                  <input
+                    type="password"
+                    className={inputClass(isLoading)}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    autoComplete="new-password"
+                    disabled={isLoading}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-fg-muted">
+                    Confirm password
+                  </label>
+                  <input
+                    type="password"
+                    className={inputClass(isLoading)}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    autoComplete="new-password"
+                    disabled={isLoading}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void savePassword()}
+                  disabled={savingPassword || isLoading}
+                  className="rounded-2xl bg-[rgb(var(--accent))] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(99,102,241,0.35)] disabled:opacity-50"
+                >
+                  {savingPassword ? "Updating…" : "Update password"}
+                </button>
               </>
             ) : null}
 
@@ -191,7 +389,7 @@ export function SettingsHub() {
               <>
                 <h3 className="text-sm font-semibold text-fg">Notification rules</h3>
                 <p className="text-sm text-fg-soft">
-                  These preferences apply to in-app and email-style nudges as we roll them out. Stored on your account.
+                  These preferences apply as in-app and email nudges roll out. Stored on your account.
                 </p>
                 <div className="space-y-2">
                   <SettingsSwitchRow
@@ -226,8 +424,7 @@ export function SettingsHub() {
               <>
                 <h3 className="text-sm font-semibold text-fg">Integrations</h3>
                 <p className="text-sm text-fg-soft">
-                  Turn on the tools you use. OAuth connections are enabled per workspace as we ship connectors; your
-                  choices here tell Wuug what to prioritize.
+                  Tell us which connectors matter; OAuth is enabled per workspace as we ship them.
                 </p>
                 <div className="space-y-2">
                   <SettingsSwitchRow
@@ -269,22 +466,61 @@ export function SettingsHub() {
                 </div>
               </>
             ) : null}
+
+            {selected === "danger" ? (
+              <>
+                <h3 className="text-sm font-semibold text-fg">Data & deletion</h3>
+                <p className="text-sm leading-relaxed text-fg-soft">
+                  Deleting an account removes your login and should unlink personal data from this workspace. That
+                  requires a server-side step so we don’t leave orphaned records.
+                </p>
+                <div className="rounded-2xl border border-red-500/35 bg-red-500/10 px-4 py-3">
+                  <p className="text-sm font-semibold text-fg">Delete account</p>
+                  <p className="mt-1 text-xs leading-relaxed text-fg-soft">
+                    {SUPPORT_EMAIL
+                      ? `Email ${SUPPORT_EMAIL} from your registered address and ask to delete your Wuug account. We’ll confirm and remove access.`
+                      : "Set NEXT_PUBLIC_SUPPORT_EMAIL in your deployment to show a contact address here. Until then, ask your workspace owner to remove your access or contact whoever runs this Wuug instance."}
+                  </p>
+                  {SUPPORT_EMAIL ? (
+                    <a
+                      href={`mailto:${encodeURIComponent(SUPPORT_EMAIL)}?subject=${encodeURIComponent("Delete my Wuug account")}`}
+                      className="mt-3 inline-flex rounded-2xl border border-red-500/40 bg-surface/80 px-4 py-2.5 text-sm font-semibold text-red-600 dark:text-red-400"
+                    >
+                      Email support
+                    </a>
+                  ) : null}
+                </div>
+                <p className="text-xs text-fg-soft">
+                  To stop using Wuug immediately, use <span className="font-medium text-fg">Log out</span> in the header
+                  menu.
+                </p>
+              </>
+            ) : null}
           </div>
         </GlassCard>
 
         <GlassCard className="p-6">
           <h3 className="text-lg font-semibold text-fg">Shortcuts</h3>
-          <p className="mt-2 text-sm text-fg-soft">Jump to common workflows.</p>
+          <p className="mt-2 text-sm text-fg-soft">Common places in your workspace.</p>
           <div className="mt-4 grid gap-2">
-            <PressableLink href="/tasks" variant="primary" fullWidth>
+            <PressableLink href="/team" variant="primary" fullWidth>
+              Team & invites
+            </PressableLink>
+            <PressableLink href="/tasks" variant="secondary" fullWidth>
               Tasks
             </PressableLink>
             <PressableLink href="/clients" variant="secondary" fullWidth>
               Clients
             </PressableLink>
-            <PressableLink href="/radar" variant="ghost" fullWidth>
-              Radar
-            </PressableLink>
+            {role !== "member" ? (
+              <PressableLink href="/radar" variant="ghost" fullWidth>
+                Radar
+              </PressableLink>
+            ) : (
+              <PressableLink href="/my-day" variant="ghost" fullWidth>
+                My Day
+              </PressableLink>
+            )}
           </div>
         </GlassCard>
       </div>

@@ -116,7 +116,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         "organizations.select",
       );
 
-      setOrganization((orgRow as Organization) ?? null);
+      if (orgRow && typeof orgRow === "object" && "name" in orgRow && typeof (orgRow as Organization).name === "string") {
+        setOrganization(orgRow as Organization);
+        return;
+      }
+
+      const meta = currentUser.user_metadata as { organization_name?: string } | undefined;
+      const metaName = meta?.organization_name?.trim();
+      if (metaName) {
+        setOrganization({
+          id: nextProfile.organization_id,
+          name: metaName,
+          logo_url: null,
+          industry: null,
+        });
+        return;
+      }
+
+      setOrganization(null);
     } catch {
       // Avoid indefinite loading if the network is down / Supabase is unreachable.
       setProfile(null);

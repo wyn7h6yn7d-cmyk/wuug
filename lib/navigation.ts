@@ -6,6 +6,7 @@ import {
   ListTodo,
   Radar,
   Settings,
+  UserPlus,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -20,6 +21,7 @@ export function getNavigationForRole(role: "owner" | "manager" | "member"): Navi
   if (role === "member") {
     return [
       { href: "/my-day", label: "My Day", icon: LayoutDashboard },
+      { href: "/team", label: "Team", icon: UserPlus },
       { href: "/clients", label: "My Clients", icon: Users },
       { href: "/projects", label: "My Projects", icon: FolderKanban },
       { href: "/tasks", label: "My Tasks", icon: ListTodo },
