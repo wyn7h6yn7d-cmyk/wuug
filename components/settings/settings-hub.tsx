@@ -82,7 +82,7 @@ function inputClass(disabled?: boolean) {
 }
 
 export function SettingsHub() {
-  const { user, profile, organization, role, isLoading, refreshProfile } = useAuth();
+  const { user, profile, organization, role, platformAdmin, isLoading, refreshProfile } = useAuth();
   const supabase = React.useMemo(() => createClient(), []);
 
   const [selected, setSelected] = React.useState<SectionId>("people");
@@ -219,7 +219,12 @@ export function SettingsHub() {
           subtitle="People, your profile, security, notifications, and workspace data."
         />
         <div className="flex flex-wrap items-center gap-2">
-          <PressableLink href="/team" variant="primary" size="sm">
+          {platformAdmin ? (
+            <PressableLink href="/admin" variant="primary" size="sm">
+              Admin panel
+            </PressableLink>
+          ) : null}
+          <PressableLink href="/team" variant={platformAdmin ? "secondary" : "primary"} size="sm">
             Team & invites
           </PressableLink>
           <PressableLink href="/tasks" variant="secondary" size="sm">

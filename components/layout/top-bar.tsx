@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import * as React from "react";
-import { Bell, ChevronDown, LogOut, Search, Settings as SettingsIcon } from "lucide-react";
+import { Bell, ChevronDown, LogOut, Search, Settings as SettingsIcon, Shield } from "lucide-react";
 import { CreateItemFlow } from "@/components/actions/create-item-flow";
 import { useAuth } from "@/components/providers/auth-provider";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 
 export function TopBar() {
-  const { profile, user, organization, isLoading, signOut } = useAuth();
+  const { profile, user, organization, platformAdmin, isLoading, signOut } = useAuth();
   const [open, setOpen] = React.useState(false);
   const accountRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -111,6 +111,16 @@ export function TopBar() {
                 <div className="mt-1 text-xs text-fg-soft">{profile?.email ?? user?.email ?? ""}</div>
               </div>
               <div className="h-px bg-token-soft/70" />
+              {platformAdmin ? (
+                <Link
+                  href="/admin"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-fg-muted hover:bg-bg2"
+                >
+                  <Shield className="h-4 w-4" />
+                  Admin panel
+                </Link>
+              ) : null}
               <Link
                 href="/settings"
                 onClick={() => setOpen(false)}

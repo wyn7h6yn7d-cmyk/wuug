@@ -52,7 +52,7 @@ export function TeamPageClient({
   const [inviteEmail, setInviteEmail] = React.useState("");
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
-  const [inviteRole, setInviteRole] = React.useState<"member" | "manager">("member");
+  const inviteRole = "member" as const;
   const [localInvites, setLocalInvites] = React.useState<InviteRow[]>(invitations);
 
   async function createInvitation() {
@@ -104,7 +104,6 @@ export function TeamPageClient({
       setInviteEmail("");
       setFirstName("");
       setLastName("");
-      setInviteRole("member");
     } finally {
       setBusy(false);
     }
@@ -261,17 +260,11 @@ export function TeamPageClient({
               />
             </label>
 
-            <label className="mt-3 block">
-              <span className="mb-1.5 block text-sm font-medium text-slate-700">Role</span>
-              <select
-                value={inviteRole}
-                onChange={(e) => setInviteRole(e.target.value as "member" | "manager")}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 focus:outline-none"
-              >
-                <option value="member">Team Member</option>
-                <option value="manager">Manager</option>
-              </select>
-            </label>
+            <p className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-600">
+              New invites join as <span className="font-semibold text-slate-800">Team Member</span>. Promoting someone
+              to manager is done in the platform <span className="font-semibold">Admin</span> panel after billing is
+              confirmed.
+            </p>
 
             {error ? (
               <div className="mt-3 rounded-2xl border border-orange-200 bg-orange-50 p-3 text-sm text-orange-700">

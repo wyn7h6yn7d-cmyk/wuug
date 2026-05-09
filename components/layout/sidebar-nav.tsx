@@ -9,8 +9,8 @@ import { useAuth } from "@/components/providers/auth-provider";
 
 export function SidebarNav() {
   const pathname = usePathname();
-  const { role } = useAuth();
-  const navigationItems = getNavigationForRole(role ?? "member");
+  const { role, platformAdmin } = useAuth();
+  const navigationItems = getNavigationForRole(role ?? "member", { platformAdmin });
 
   return (
     <aside

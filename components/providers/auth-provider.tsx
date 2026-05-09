@@ -14,6 +14,9 @@ export type Profile = {
   email: string;
   avatar_url: string | null;
   role: UserRole;
+  platform_admin: boolean;
+  banned_at: string | null;
+  ban_reason: string | null;
 };
 
 export type Organization = {
@@ -21,6 +24,10 @@ export type Organization = {
   name: string;
   logo_url: string | null;
   industry: string | null;
+  subscription_status: string | null;
+  subscription_ends_at: string | null;
+  invoice_paid_at: string | null;
+  access_paused: boolean | null;
 };
 
 type AuthContextValue = {
@@ -28,6 +35,7 @@ type AuthContextValue = {
   profile: Profile | null;
   organization: Organization | null;
   role: UserRole | null;
+  platformAdmin: boolean;
   isLoading: boolean;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -67,6 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = React.useState(true);
 
   const role = profile?.role ?? null;
+  const platformAdmin = profile?.platform_admin ?? false;
 
   const refreshProfile = React.useCallback(async () => {
     try {
@@ -84,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         () =>
           (supabase
             .from("profiles")
-            .select("id, organization_id, full_name, email, avatar_url, role")
+            .select("id, organization_id, full_name, email, avatar_url, role, platform_admin, banned_at, ban_reason")
             .eq("id", currentUser.id)
             .maybeSingle() as unknown) as Promise<{ data: unknown; error: unknown }>,
         6000,
@@ -97,7 +106,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const nextProfile = profileRow as Profile;
+      const raw = profileRow as Profile;
+      const nextProfile: Profile = {
+        ...raw,
+        platform_admin: Boolean((raw as { platform_admin?: boolean }).platform_admin),
+        banned_at: (raw as { banned_at?: string | null }).banned_at ?? null,
+        ban_reason: (raw as { ban_reason?: string | null }).ban_reason ?? null,
+      };
       setProfile(nextProfile);
 
       if (!nextProfile.organization_id) {
@@ -109,7 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         () =>
           (supabase
             .from("organizations")
-            .select("id, name, logo_url, industry")
+            .select("id, name, logo_url, industry, subscription_status, subscription_ends_at, invoice_paid_at, access_paused")
             .eq("id", nextProfile.organization_id)
             .maybeSingle() as unknown) as Promise<{ data: unknown; error: unknown }>,
         6000,
@@ -117,7 +132,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       );
 
       if (orgRow && typeof orgRow === "object" && "name" in orgRow && typeof (orgRow as Organization).name === "string") {
-        setOrganization(orgRow as Organization);
+        const o = orgRow as Organization;
+        setOrganization({
+          ...o,
+          subscription_status: o.subscription_status ?? null,
+          subscription_ends_at: o.subscription_ends_at ?? null,
+          invoice_paid_at: o.invoice_paid_at ?? null,
+          access_paused: o.access_paused ?? null,
+        });
         return;
       }
 
@@ -129,6 +151,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           name: metaName,
           logo_url: null,
           industry: null,
+          subscription_status: null,
+          subscription_ends_at: null,
+          invoice_paid_at: null,
+          access_paused: null,
         });
         return;
       }
@@ -209,11 +235,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       profile,
       organization,
       role,
+      platformAdmin,
       isLoading,
       signOut,
       refreshProfile,
     }),
-    [isLoading, organization, profile, refreshProfile, role, signOut, user],
+    [isLoading, organization, platformAdmin, profile, refreshProfile, role, signOut, user],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

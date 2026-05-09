@@ -9,8 +9,8 @@ import { useAuth } from "@/components/providers/auth-provider";
 
 export function MobileNav() {
   const pathname = usePathname();
-  const { role } = useAuth();
-  const navigationItems = getNavigationForRole(role ?? "member");
+  const { role, platformAdmin } = useAuth();
+  const navigationItems = getNavigationForRole(role ?? "member", { platformAdmin });
 
   return (
     <div className="mb-4 rounded-[24px] glass p-3 lg:hidden">
