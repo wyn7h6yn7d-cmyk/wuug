@@ -71,11 +71,13 @@ export function ClientsPageClient({
   owners,
   role,
   profileId,
+  organizationId,
 }: {
   initialClients: ClientRow[];
   owners: OwnerOption[];
   role: AppRole;
   profileId: string;
+  organizationId: string;
 }) {
   const supabase = React.useMemo(() => createClient(), []);
   const [clients, setClients] = React.useState<ClientRow[]>(initialClients);
@@ -137,7 +139,9 @@ export function ClientsPageClient({
   // Note: we keep a simple optimistic UI for now (no explicit refetch).
 
   async function logActivity(action: string, title: string, description?: string, clientId?: string) {
+    if (!organizationId) return;
     await supabase.from("activity_log").insert({
+      organization_id: organizationId,
       type: "client",
       title,
       description: description ?? null,
@@ -309,29 +313,40 @@ export function ClientsPageClient({
           setBusy(true);
           setFormError(null);
           try {
+            if (!organizationId) {
+              setFormError("No workspace linked. You cannot create clients until you belong to an organization.");
+              return;
+            }
             const nextDue = values.next_step_due_date ? new Date(values.next_step_due_date).toISOString() : null;
+            const { data: newId, error: rpcError } = await supabase.rpc("create_workspace_client", {
+              p_name: values.name,
+              p_contact_name: values.contact_name || null,
+              p_email: values.email || null,
+              p_phone: values.phone || null,
+              p_status: values.status,
+              p_health: values.health,
+              p_priority: values.priority,
+              p_note: values.note || null,
+              p_next_step: values.next_step || null,
+              p_next_step_due_at: nextDue,
+              p_owner_id: canManageOwner ? values.owner_id || null : null,
+            });
+
+            if (rpcError) {
+              setFormError(rpcError.message);
+              return;
+            }
+
             const { data, error } = await supabase
               .from("clients")
-              .insert({
-                name: values.name,
-                contact_name: values.contact_name || null,
-                email: values.email || null,
-                phone: values.phone || null,
-                status: values.status,
-                health: values.health,
-                priority: values.priority,
-                note: values.note || null,
-                next_step: values.next_step || null,
-                next_step_due_at: nextDue,
-                owner_id: (canManageOwner ? values.owner_id : profileId) || null,
-              })
               .select(
                 "id,name,contact_name,email,phone,status,health,priority,note,next_step,next_step_due_at,owner_id,created_at",
               )
-              .single();
+              .eq("id", newId as string)
+              .maybeSingle();
 
-            if (error) {
-              setFormError(error.message);
+            if (error || !data) {
+              setFormError(error?.message ?? "Client was created but could not be loaded. Refresh the page.");
               return;
             }
 

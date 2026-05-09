@@ -7,7 +7,9 @@ export default async function ClientsPage() {
 
   // Platform layout already enforces auth, but keep this safe.
   if (!user) {
-    return <ClientsPageClient initialClients={[]} owners={[]} role={"member"} profileId={""} />;
+    return (
+      <ClientsPageClient initialClients={[]} owners={[]} role={"member"} profileId={""} organizationId={""} />
+    );
   }
 
   const { data: profileRow } = await supabase
@@ -18,6 +20,7 @@ export default async function ClientsPage() {
 
   const role = ((profileRow?.role as AppRole | undefined) ?? "member") as AppRole;
   const profileId = profileRow?.id ?? user.id;
+  const organizationId = profileRow?.organization_id ?? "";
 
   // Owners list for manager UI.
   const { data: ownerRows } = await supabase
@@ -48,6 +51,7 @@ export default async function ClientsPage() {
       owners={owners}
       role={role}
       profileId={profileId}
+      organizationId={organizationId}
     />
   );
 }

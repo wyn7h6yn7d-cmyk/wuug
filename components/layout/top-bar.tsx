@@ -3,7 +3,6 @@
 import Link from "next/link";
 import * as React from "react";
 import { Bell, ChevronDown, LogOut, Search, Settings as SettingsIcon, Shield } from "lucide-react";
-import { CreateItemFlow } from "@/components/actions/create-item-flow";
 import { useAuth } from "@/components/providers/auth-provider";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
@@ -57,7 +56,6 @@ export function TopBar() {
       </label>
 
       <div className="flex items-center gap-2 sm:gap-3">
-        <CreateItemFlow />
         <button
           className="hidden items-center justify-center rounded-2xl border border-token-soft bg-surface/70 p-3 text-fg-muted hover:text-fg active:scale-[0.98] sm:inline-flex"
           aria-label="Notifications"
