@@ -13,6 +13,8 @@ export default async function LoginPage({
   const created = params.created === "1";
   const confirm = params.confirm === "1";
   const error = params.error === "1";
+  const msgParam = params.msg;
+  const msg = typeof msgParam === "string" ? decodeURIComponent(msgParam) : null;
 
   return (
     <div className="min-h-screen bg-[#F7FAFF] p-4 sm:p-8">
@@ -37,7 +39,8 @@ export default async function LoginPage({
           ) : null}
           {error ? (
             <div className="mt-4 rounded-2xl border border-orange-200 bg-orange-50 p-3 text-sm text-orange-700">
-              Sign-in failed. Please try again.
+              <div className="font-semibold">Sign-in failed.</div>
+              <div className="mt-1">{msg ?? "Please try again."}</div>
             </div>
           ) : null}
 

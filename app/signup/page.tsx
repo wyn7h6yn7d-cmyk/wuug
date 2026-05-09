@@ -11,6 +11,8 @@ export default async function SignupPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const error = resolvedSearchParams?.error === "1";
+  const msgParam = resolvedSearchParams?.msg;
+  const msg = typeof msgParam === "string" ? decodeURIComponent(msgParam) : null;
   return (
     <div className="min-h-screen bg-[#F7FAFF] p-4 sm:p-8">
       <div className="mx-auto max-w-md">
@@ -24,7 +26,8 @@ export default async function SignupPage({
 
           {error ? (
             <div className="mt-4 rounded-2xl border border-orange-200 bg-orange-50 p-3 text-sm text-orange-700">
-              Sign-up failed. Please try again.
+              <div className="font-semibold">Sign-up failed.</div>
+              <div className="mt-1">{msg ?? "Please try again."}</div>
             </div>
           ) : null}
 

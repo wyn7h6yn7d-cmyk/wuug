@@ -4,13 +4,18 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+function encodeErr(message: string) {
+  const trimmed = message.trim().slice(0, 180);
+  return encodeURIComponent(trimmed);
+}
+
 export async function signIn(formData: FormData) {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
 
   const supabase = createClient(await cookies());
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) redirect("/login?error=1");
+  if (error) redirect(`/login?error=1&msg=${encodeErr(error.message)}`);
 
   // Route by role.
   const { data: userData } = await supabase.auth.getUser();
@@ -46,7 +51,7 @@ export async function signUp(formData: FormData) {
     },
   });
 
-  if (error) redirect("/signup?error=1");
+  if (error) redirect(`/signup?error=1&msg=${encodeErr(error.message)}`);
 
   // If email confirmations are enabled, there may be no session yet.
   if (!data.session) redirect("/login?confirm=1");
@@ -58,7 +63,7 @@ export async function signUp(formData: FormData) {
 
   if (workspaceError) {
     await supabase.auth.signOut();
-    redirect("/signup?error=1");
+    redirect(`/signup?error=1&msg=${encodeErr(workspaceError.message)}`);
   }
 
   redirect("/manager");
